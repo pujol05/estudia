@@ -1,0 +1,15 @@
+{
+  "HomePage": {
+    "title": "Resum"
+  },
+  "Navigation": {
+    "home": "Resum",
+    "subjects": "Assignatures",
+    "tasks": "Tasques",
+    "exams": "Exàmens",
+    "grades": "Notes"
+  }, 
+  "LanguageSelector": {
+    "label": "Canviar idioma"
+  }
+}

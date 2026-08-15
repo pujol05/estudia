@@ -1,0 +1,15 @@
+{
+  "HomePage": {
+    "title": "Resumen"
+  },
+  "Navigation": {
+    "home": "Resumen",
+    "subjects": "Asignaturas",
+    "tasks": "Tareas",
+    "exams": "Exámenes",
+    "grades": "Notas"
+  },
+  "LanguageSelector": {
+    "label": "Change language"
+  }
+}

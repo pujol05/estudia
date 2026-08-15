@@ -1,0 +1,15 @@
+{
+  "HomePage": {
+    "title": "Overview"
+  },
+  "Navigation": {
+    "home": "Overview",
+    "subjects": "Subjects",
+    "tasks": "Tasks",
+    "exams": "Exams",
+    "grades": "Grades"
+  },
+  "LanguageSelector": {
+    "label": "Change language"
+  }
+}
