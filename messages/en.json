@@ -20,5 +20,33 @@
     "cookies": "Cookies",
     "accessibility": "Accessibility",
     "rights": "All rights reserved."
+  },
+  "Auth": {
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Access your Estudia account.",
+      "email": "Email address",
+      "password": "Password",
+      "submit": "Sign in",
+      "loading": "Signing in...",
+      "invalidCredentials": "The email or password is incorrect.",
+      "noAccount": "Don't have an account yet?",
+      "register": "Create account"
+    },
+    "register": {
+      "title": "Create account",
+      "subtitle": "Create your account to start organizing your studies.",
+      "name": "Name",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Repeat password",
+      "submit": "Create account",
+      "loading": "Creating account...",
+      "passwordsDoNotMatch": "The passwords do not match.",
+      "passwordTooShort": "The password must be at least 8 characters long.",
+      "registerError": "The account could not be created. Check your details or try another email.",
+      "alreadyAccount": "Already have an account?",
+      "login": "Sign in"
+    }
   }
 }

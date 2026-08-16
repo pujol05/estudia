@@ -20,5 +20,33 @@
     "cookies": "Cookies",
     "accessibility": "Accessibilitat",
     "rights": "Tots els drets reservats."
+  },
+  "Auth": {
+    "login": {
+      "title": "Iniciar sessió",
+      "subtitle": "Accedeix al teu compte d'Estudia.",
+      "email": "Correu electrònic",
+      "password": "Contrasenya",
+      "submit": "Iniciar sessió",
+      "loading": "Iniciant sessió...",
+      "invalidCredentials": "El correu o la contrasenya no són correctes.",
+      "noAccount": "Encara no tens compte?",
+      "register": "Crear compte"
+    },
+    "register": {
+      "title": "Crear compte",
+      "subtitle": "Crea el teu compte per començar a organitzar els teus estudis.",
+      "name": "Nom",
+      "email": "Correu electrònic",
+      "password": "Contrasenya",
+      "confirmPassword": "Repeteix la contrasenya",
+      "submit": "Crear compte",
+      "loading": "Creant compte...",
+      "passwordsDoNotMatch": "Les contrasenyes no coincideixen.",
+      "passwordTooShort": "La contrasenya ha de tenir com a mínim 8 caràcters.",
+      "registerError": "No s'ha pogut crear el compte. Revisa les dades o prova amb un altre correu.",
+      "alreadyAccount": "Ja tens compte?",
+      "login": "Iniciar sessió"
+    }
   }
 }

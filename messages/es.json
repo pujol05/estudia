@@ -20,5 +20,33 @@
     "cookies": "Cookies",
     "accessibility": "Accesibilidad",
     "rights": "Todos los derechos reservados."
+  },
+  "Auth": {
+    "login": {
+      "title": "Iniciar sesión",
+      "subtitle": "Accede a tu cuenta de Estudia.",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión",
+      "loading": "Iniciando sesión...",
+      "invalidCredentials": "El correo o la contraseña no son correctos.",
+      "noAccount": "¿Todavía no tienes cuenta?",
+      "register": "Crear cuenta"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "subtitle": "Crea tu cuenta para empezar a organizar tus estudios.",
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Repite la contraseña",
+      "submit": "Crear cuenta",
+      "loading": "Creando cuenta...",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "registerError": "No se ha podido crear la cuenta. Revisa los datos o prueba con otro correo.",
+      "alreadyAccount": "¿Ya tienes cuenta?",
+      "login": "Iniciar sesión"
+    }
   }
 }
