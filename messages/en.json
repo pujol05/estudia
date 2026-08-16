@@ -11,5 +11,14 @@
   },
   "LanguageSelector": {
     "label": "Change language"
+  },
+  "Footer": {
+    "tagline": "Organize your studies easily and efficiently.",
+    "contact": "Contact",
+    "legal": "Legal notice",
+    "privacy": "Privacy",
+    "cookies": "Cookies",
+    "accessibility": "Accessibility",
+    "rights": "All rights reserved."
   }
 }
