@@ -12,6 +12,7 @@ export default function RegisterForm() {
   const t = useTranslations("Auth.register");
   const router = useRouter();
 
+  //quan luser escriu canvia de "" a name amb setName("input")
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

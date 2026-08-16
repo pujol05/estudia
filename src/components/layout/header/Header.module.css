@@ -59,3 +59,31 @@
   font-size: 14px;
   font-weight: 500;
 }
+
+.authLinks {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.authLinks a {
+  color: var(--header-text);
+}
+
+.authLinks a:hover {
+  color: var(--color-white);
+}
+
+.registerButton {
+  padding: 9px 14px;
+
+  background-color: var(--color-primary);
+
+  border-radius: 7px;
+
+  color: var(--color-white) !important;
+}

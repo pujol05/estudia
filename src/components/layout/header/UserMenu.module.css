@@ -1,0 +1,98 @@
+.userMenu {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 5px 8px;
+
+  background: transparent;
+  color: var(--header-text);
+
+  border: 0;
+  border-radius: 7px;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.trigger:hover {
+  background-color: var(--color-primary);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background-color: var(--color-primary);
+  color: var(--color-white);
+
+  border-radius: 50%;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.arrow {
+  font-size: 11px;
+}
+
+.menu {
+  position: absolute;
+
+  top: calc(100% + 8px);
+  right: 0;
+
+  min-width: 160px;
+
+  padding: 6px;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+
+  box-shadow: 0 8px 24px rgb(0 0 0 / 15%);
+
+  z-index: 100;
+}
+
+.logout {
+  width: 100%;
+
+  padding: 10px;
+
+  background: transparent;
+  color: var(--color-dark);
+
+  border: 0;
+  border-radius: 5px;
+
+  font: inherit;
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.logout:hover {
+  background-color: var(--color-light);
+}

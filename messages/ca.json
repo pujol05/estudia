@@ -7,7 +7,10 @@
     "subjects": "Assignatures",
     "tasks": "Tasques",
     "exams": "Exàmens",
-    "grades": "Notes"
+    "grades": "Notes",
+    "login": "Iniciar sessió",
+    "register": "Crear compte",
+    "logout": "Tancar sessió"
   }, 
   "LanguageSelector": {
     "label": "Canviar idioma"
