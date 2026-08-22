@@ -1,0 +1,370 @@
+.page {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.heading h1 {
+  margin-bottom: 8px;
+  color: var(--color-dark);
+  font-size: 34px;
+  line-height: 1.15;
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.subtitle,
+.editorHeading p,
+.emptyState p,
+.cardContent p,
+.dialog p {
+  color: #5f6b72;
+  line-height: 1.5;
+}
+
+.editor {
+  margin-bottom: 28px;
+  padding: 28px;
+  background-color: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgb(10 49 67 / 6%);
+}
+
+.editorHeading {
+  margin-bottom: 22px;
+}
+
+.editorHeading h2,
+.emptyState h2,
+.dialog h2 {
+  margin-bottom: 6px;
+  color: var(--color-dark);
+  font-size: 20px;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: flex-end;
+  gap: 18px;
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  color: var(--color-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.field input {
+  width: 100%;
+  padding: 12px 14px;
+  background-color: var(--color-white);
+  color: var(--color-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  font: inherit;
+}
+
+.field input:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.formActions,
+.cardActions,
+.dialogActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.confirmDeleteButton {
+  padding: 11px 15px;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.primaryButton {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: 1px solid var(--color-primary);
+}
+
+.secondaryButton {
+  background-color: var(--color-white);
+  color: var(--color-dark);
+  border: 1px solid var(--border-color);
+}
+
+.dangerButton {
+  background-color: transparent;
+  color: #9b2c20;
+  border: 1px solid transparent;
+}
+
+.confirmDeleteButton {
+  background-color: #9b2c20;
+  color: var(--color-white);
+  border: 1px solid #9b2c20;
+}
+
+.primaryButton:hover,
+.secondaryButton:hover,
+.dangerButton:hover,
+.confirmDeleteButton:hover {
+  filter: brightness(0.96);
+}
+
+.secondaryButton:hover {
+  border-color: #aeb3b0;
+}
+
+.dangerButton:hover {
+  background-color: #fff2f0;
+}
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.dangerButton:focus-visible,
+.confirmDeleteButton:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.dangerButton:disabled,
+.confirmDeleteButton:disabled,
+.field input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error,
+.success {
+  margin-bottom: 24px;
+  padding: 12px 14px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.error {
+  background-color: #fff2f0;
+  color: #9b2c20;
+}
+
+.success {
+  background-color: #eef8f2;
+  color: #246347;
+}
+
+.subjectsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.subjectCard {
+  min-width: 0;
+  min-height: 164px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  background-color: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-top: 4px solid var(--color-primary);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgb(10 49 67 / 5%);
+}
+
+.cardContent {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cardContent h2 {
+  overflow-wrap: anywhere;
+  color: var(--color-dark);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.cardContent p {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.subjectInitial,
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5f1f6;
+  color: var(--color-primary);
+  border-radius: 10px;
+  font-weight: 750;
+}
+
+.subjectInitial {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  font-size: 19px;
+}
+
+.editForm {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.emptyState {
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 28px;
+  background-color: var(--color-white);
+  border: 1px dashed #aeb9bd;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.emptyState p {
+  max-width: 460px;
+  margin-bottom: 22px;
+}
+
+.dialogBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-color: rgb(3 24 34 / 58%);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 480px;
+  padding: 28px;
+  background-color: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 18px 50px rgb(0 0 0 / 24%);
+}
+
+.dialog p {
+  margin-top: 8px;
+}
+
+.deleteWarning {
+  padding: 10px 12px;
+  background-color: #fff8e8;
+  color: #775b18 !important;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.dialogActions {
+  margin-top: 26px;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 40px 20px 56px;
+  }
+
+  .heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .heading > .primaryButton {
+    width: 100%;
+  }
+
+  .form,
+  .subjectsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .formActions {
+    width: 100%;
+  }
+
+  .formActions button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 440px) {
+  .editor,
+  .subjectCard,
+  .dialog {
+    padding: 22px;
+  }
+
+  .cardActions,
+  .dialogActions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .cardActions button,
+  .dialogActions button {
+    width: 100%;
+  }
+}
