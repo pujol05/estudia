@@ -1,6 +1,5 @@
-"use client"; // This is a client component because it uses useState and useRouter
+"use client";
 
-import { useState } from "react"; //recorda estat actual, isOpen, setIsOpen per modificar
 import { useLocale, useTranslations } from "next-intl";
 
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -30,10 +29,12 @@ const languages = [
 nomes permet aquests 3 valors. */
 type LanguageCode = (typeof languages)[number]["code"]; 
 
+type Props = {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+};
 
-export default function LanguageSelector() {
-  const [isOpen, setIsOpen] = useState(false);
-
+export default function LanguageSelector({ isOpen, onOpenChange }: Props) {
   const locale = useLocale(); //retorna l'idioma actual de la ruta, per exemple "ca", "es" o "en"
   const pathname = usePathname(); //pagina actual /tasks, /grades, /subjects, etc.
   const router = useRouter(); //navegar amb JS , en lloc de fer un refresh de la pagina, canvia l'idioma i manté la pagina actual.
@@ -47,7 +48,7 @@ export default function LanguageSelector() {
       locale: newLocale,
     });
     //canvia el locale, de ca/tasks a es/tasks i tanca el menu desplegable d'idiomes. 
-    setIsOpen(false);
+    onOpenChange(false);
   }
 
   return (
@@ -55,7 +56,7 @@ export default function LanguageSelector() {
       <button
         type="button"
         className={styles.trigger}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => onOpenChange(!isOpen)}
         aria-expanded={isOpen}
         aria-label={t("label")}
       >

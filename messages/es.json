@@ -10,6 +10,7 @@
     "grades": "Notas",
     "login": "Iniciar sesión",
     "register": "Crear cuenta",
+    "profile": "Mi perfil",
     "logout": "Cerrar sesión"
   },
   "LanguageSelector": {
@@ -23,6 +24,31 @@
     "cookies": "Cookies",
     "accessibility": "Accesibilidad",
     "rights": "Todos los derechos reservados."
+  },
+  "Profile": {
+    "title": "Mi perfil",
+    "subtitle": "Actualiza tu información personal y la foto de perfil.",
+    "photoTitle": "Foto de perfil",
+    "photoHelp": "JPG, PNG o WebP. Máximo 5 MB.",
+    "photoSelect": "Seleccionar foto de perfil",
+    "photoPreparing": "Preparando foto...",
+    "photoChange": "Cambiar foto",
+    "photoRemove": "Eliminar foto",
+    "photoInvalidType": "Elige una imagen JPG, PNG o WebP.",
+    "photoTooLarge": "La imagen no puede superar los 5 MB.",
+    "photoError": "No se ha podido preparar la foto.",
+    "personalData": "Datos personales",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "emailHelp": "Este correo se utiliza para iniciar sesión.",
+    "birthDate": "Fecha de nacimiento",
+    "nameError": "El nombre debe tener entre 2 y 80 caracteres.",
+    "emailError": "No se ha podido cambiar el correo. Puede que ya esté en uso.",
+    "birthDateError": "Introduce una fecha de nacimiento válida.",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "saveSuccess": "Perfil actualizado correctamente.",
+    "saveError": "No se ha podido actualizar el perfil. Vuelve a intentarlo."
   },
   "Auth": {
     "login": {

@@ -62,7 +62,7 @@
   top: calc(100% + 8px);
   right: 0;
 
-  min-width: 160px;
+  width: 224px;
 
   padding: 6px;
 
@@ -76,6 +76,7 @@
   z-index: 100;
 }
 
+.menuAction,
 .logout {
   width: 100%;
 
@@ -93,6 +94,19 @@
   cursor: pointer;
 }
 
+.menuAction:hover,
 .logout:hover {
   background-color: var(--color-light);
+}
+
+.menuAction:focus-visible,
+.logout:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.divider {
+  height: 1px;
+  margin: 6px 4px;
+  background-color: var(--border-color);
 }

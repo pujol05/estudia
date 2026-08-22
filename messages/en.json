@@ -10,6 +10,7 @@
     "grades": "Grades",
     "login": "Sign in",
     "register": "Create account",
+    "profile": "My profile",
     "logout": "Sign out"
   },
   "LanguageSelector": {
@@ -23,6 +24,31 @@
     "cookies": "Cookies",
     "accessibility": "Accessibility",
     "rights": "All rights reserved."
+  },
+  "Profile": {
+    "title": "My profile",
+    "subtitle": "Update your personal information and profile photo.",
+    "photoTitle": "Profile photo",
+    "photoHelp": "JPG, PNG, or WebP. Maximum 5 MB.",
+    "photoSelect": "Select profile photo",
+    "photoPreparing": "Preparing photo...",
+    "photoChange": "Change photo",
+    "photoRemove": "Remove photo",
+    "photoInvalidType": "Choose a JPG, PNG, or WebP image.",
+    "photoTooLarge": "The image cannot be larger than 5 MB.",
+    "photoError": "The photo could not be prepared.",
+    "personalData": "Personal details",
+    "name": "Name",
+    "email": "Email address",
+    "emailHelp": "This email is used to sign in.",
+    "birthDate": "Date of birth",
+    "nameError": "The name must be between 2 and 80 characters.",
+    "emailError": "The email could not be changed. It may already be in use.",
+    "birthDateError": "Enter a valid date of birth.",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saveSuccess": "Profile updated successfully.",
+    "saveError": "The profile could not be updated. Please try again."
   },
   "Auth": {
     "login": {

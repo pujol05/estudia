@@ -9,8 +9,7 @@ import { Link } from "@/i18n/navigation";
 
 import styles from "./Header.module.css";
 
-import UserMenu from "./UserMenu";
-import LanguageSelector from "./languageSelector";
+import HeaderActions from "./HeaderActions";
 
 // posem sytles.header , nav ...pq tenim un fitxer css 
 export default async function Header() {
@@ -35,23 +34,12 @@ export default async function Header() {
                     <Link href="/grades">{t("grades")}</Link>
                 </nav>
                 <div className={styles.actions}>
-                    <LanguageSelector />
-                    {session ? (
-                        <UserMenu
-                            name={session.user.name}
-                            image={session.user.image ?? null}
-                        />
-                    ) : (
-                        <div className={styles.authLinks}>
-                            <Link href="/login">
-                                {t("login")}
-                            </Link>
-
-                            <Link href="/register" className={styles.registerButton}>
-                                {t("register")}
-                            </Link>
-                        </div>
-                    )}
+                    <HeaderActions
+                        user={session ? {
+                            name: session.user.name,
+                            image: session.user.image ?? null,
+                        } : null}
+                    />
                 </div>
             </div>
         </header>

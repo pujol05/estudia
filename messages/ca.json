@@ -10,6 +10,7 @@
     "grades": "Notes",
     "login": "Iniciar sessió",
     "register": "Crear compte",
+    "profile": "El meu perfil",
     "logout": "Tancar sessió"
   }, 
   "LanguageSelector": {
@@ -23,6 +24,31 @@
     "cookies": "Cookies",
     "accessibility": "Accessibilitat",
     "rights": "Tots els drets reservats."
+  },
+  "Profile": {
+    "title": "El meu perfil",
+    "subtitle": "Actualitza la teva informació personal i la foto de perfil.",
+    "photoTitle": "Foto de perfil",
+    "photoHelp": "JPG, PNG o WebP. Màxim 5 MB.",
+    "photoSelect": "Seleccionar foto de perfil",
+    "photoPreparing": "Preparant foto...",
+    "photoChange": "Canviar foto",
+    "photoRemove": "Eliminar foto",
+    "photoInvalidType": "Tria una imatge JPG, PNG o WebP.",
+    "photoTooLarge": "La imatge no pot superar els 5 MB.",
+    "photoError": "No s'ha pogut preparar la foto.",
+    "personalData": "Dades personals",
+    "name": "Nom",
+    "email": "Correu electrònic",
+    "emailHelp": "Aquest correu s'utilitza per iniciar sessió.",
+    "birthDate": "Data de naixement",
+    "nameError": "El nom ha de tenir entre 2 i 80 caràcters.",
+    "emailError": "No s'ha pogut canviar el correu. Potser ja està en ús.",
+    "birthDateError": "Introdueix una data de naixement vàlida.",
+    "save": "Desar canvis",
+    "saving": "Desant...",
+    "saveSuccess": "Perfil actualitzat correctament.",
+    "saveError": "No s'ha pogut actualitzar el perfil. Torna-ho a provar."
   },
   "Auth": {
     "login": {
