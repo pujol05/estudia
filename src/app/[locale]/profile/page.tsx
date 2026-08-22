@@ -35,6 +35,7 @@ export default async function ProfilePage({ params }: Props) {
 
   return (
     <ProfileForm
+      userId={session.user.id}
       initialName={user.name}
       initialEmail={user.email}
       initialImage={user.image}

@@ -1,6 +1,7 @@
 import {
-  isValidProfileImageDataUrl,
+  PROFILE_IMAGE_CONTENT_TYPE,
   PROFILE_IMAGE_OUTPUT_SIZE,
+  PROFILE_IMAGE_MAX_STORED_BYTES,
 } from "@/lib/profile-image";
 
 function loadImage(file: File) {
@@ -56,11 +57,19 @@ export async function prepareProfileImage(file: File) {
     outputSize,
   );
 
-  const imageDataUrl = canvas.toDataURL("image/webp", 0.82);
+  const imageBlob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, PROFILE_IMAGE_CONTENT_TYPE, 0.82);
+  });
 
-  if (!isValidProfileImageDataUrl(imageDataUrl)) {
+  if (
+    !imageBlob ||
+    imageBlob.type !== PROFILE_IMAGE_CONTENT_TYPE ||
+    imageBlob.size > PROFILE_IMAGE_MAX_STORED_BYTES
+  ) {
     throw new Error("The processed image is invalid or too large");
   }
 
-  return imageDataUrl;
+  return new File([imageBlob], "avatar.webp", {
+    type: PROFILE_IMAGE_CONTENT_TYPE,
+  });
 }

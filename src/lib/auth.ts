@@ -6,7 +6,6 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 
 import prisma from "@/lib/prisma";
-import { isValidProfileImageDataUrl } from "@/lib/profile-image";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -40,7 +39,7 @@ export const auth = betterAuth({
 
           const data = { ...user };
 
-          if ("name" in user) {
+          if ("name" in user && user.name !== undefined) {
             if (typeof user.name !== "string") {
               throw new APIError("BAD_REQUEST", { message: "Invalid name" });
             }
@@ -54,14 +53,9 @@ export const auth = betterAuth({
             data.name = normalizedName;
           }
 
-          if (
-            "image" in user &&
-            user.image !== null &&
-            (typeof user.image !== "string" ||
-              !isValidProfileImageDataUrl(user.image))
-          ) {
+          if ("image" in user && user.image !== undefined) {
             throw new APIError("BAD_REQUEST", {
-              message: "Invalid profile image",
+              message: "Profile images must be updated through the upload endpoint",
             });
           }
 

@@ -3,19 +3,23 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
+import { upload } from "@vercel/blob/client";
 import { useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@/i18n/navigation";
 import { prepareProfileImage } from "@/lib/profile-image-client";
 import {
+  getProfileImageUploadPath,
   PROFILE_IMAGE_ALLOWED_TYPES,
+  PROFILE_IMAGE_CONTENT_TYPE,
   PROFILE_IMAGE_MAX_UPLOAD_BYTES,
 } from "@/lib/profile-image";
 
 import styles from "./ProfileForm.module.css";
 
 type Props = {
+  userId: string;
   initialName: string;
   initialEmail: string;
   initialImage: string | null;
@@ -23,6 +27,7 @@ type Props = {
 };
 
 export default function ProfileForm({
+  userId,
   initialName,
   initialEmail,
   initialImage,
@@ -37,7 +42,7 @@ export default function ProfileForm({
   const [savedEmail, setSavedEmail] = useState(initialEmail);
   const [birthDate, setBirthDate] = useState(initialBirthDate);
   const [image, setImage] = useState(initialImage);
-  const [isPreparingImage, setIsPreparingImage] = useState(false);
+  const [isUpdatingImage, setIsUpdatingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -70,14 +75,66 @@ export default function ProfileForm({
       return;
     }
 
-    setIsPreparingImage(true);
+    setIsUpdatingImage(true);
 
     try {
-      setImage(await prepareProfileImage(file));
+      const preparedImage = await prepareProfileImage(file);
+      const blob = await upload(
+        getProfileImageUploadPath(userId),
+        preparedImage,
+        {
+          access: "public",
+          contentType: PROFILE_IMAGE_CONTENT_TYPE,
+          handleUploadUrl: "/api/profile/avatar/upload",
+        },
+      );
+      const response = await fetch("/api/profile/avatar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: blob.url }),
+      });
+
+      if (!response.ok) {
+        throw new Error("The uploaded profile image could not be saved");
+      }
+
+      const result = (await response.json()) as { image?: unknown };
+
+      if (typeof result.image !== "string") {
+        throw new Error("The profile image response is invalid");
+      }
+
+      setImage(result.image);
+      setSuccess(t("photoSaveSuccess"));
+      router.refresh();
     } catch {
-      setError(t("photoError"));
+      setError(t("photoUploadError"));
     } finally {
-      setIsPreparingImage(false);
+      setIsUpdatingImage(false);
+    }
+  }
+
+  async function handlePhotoRemove() {
+    setError("");
+    setSuccess("");
+    setIsUpdatingImage(true);
+
+    try {
+      const response = await fetch("/api/profile/avatar", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("The profile image could not be removed");
+      }
+
+      setImage(null);
+      setSuccess(t("photoRemoveSuccess"));
+      router.refresh();
+    } catch {
+      setError(t("photoRemoveError"));
+    } finally {
+      setIsUpdatingImage(false);
     }
   }
 
@@ -115,7 +172,6 @@ export default function ProfileForm({
 
       const { error: updateError } = await authClient.updateUser({
         name: normalizedName,
-        image,
         birthDate: birthDate
           ? new Date(`${birthDate}T00:00:00.000Z`)
           : null,
@@ -173,23 +229,24 @@ export default function ProfileForm({
                 accept={PROFILE_IMAGE_ALLOWED_TYPES.join(",")}
                 onChange={handlePhotoChange}
                 aria-label={t("photoSelect")}
+                disabled={isUpdatingImage || isSaving}
               />
 
               <button
                 type="button"
                 className={styles.secondaryButton}
                 onClick={() => fileInputRef.current?.click()}
-                disabled={isPreparingImage || isSaving}
+                disabled={isUpdatingImage || isSaving}
               >
-                {isPreparingImage ? t("photoPreparing") : t("photoChange")}
+                {isUpdatingImage ? t("photoUploading") : t("photoChange")}
               </button>
 
               {image && (
                 <button
                   type="button"
                   className={styles.textButton}
-                  onClick={() => setImage(null)}
-                  disabled={isPreparingImage || isSaving}
+                  onClick={handlePhotoRemove}
+                  disabled={isUpdatingImage || isSaving}
                 >
                   {t("photoRemove")}
                 </button>
@@ -262,7 +319,7 @@ export default function ProfileForm({
           <button
             type="submit"
             className={styles.submitButton}
-            disabled={isSaving || isPreparingImage}
+            disabled={isSaving || isUpdatingImage}
           >
             {isSaving ? t("saving") : t("save")}
           </button>
