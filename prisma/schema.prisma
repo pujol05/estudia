@@ -19,6 +19,7 @@ model User {
   accounts Account[]
 
   subjects Subject[]
+  events   Event[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -83,10 +84,15 @@ model Subject {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  tasks Task[]
+  tasks  Task[]
+  exams  Exam[]
+  grades Grade[]
+  events Event[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Task {
@@ -95,10 +101,70 @@ model Task {
   description String?
   dueDate     DateTime?
   completed   Boolean   @default(false)
+  priority    String    @default("MEDIUM")
 
   subjectId String
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([subjectId, dueDate])
+}
+
+model Exam {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  examDate    DateTime
+  type        String   @default("FINAL")
+  completed   Boolean  @default(false)
+  score       Float?
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId, examDate])
+}
+
+model Grade {
+  id       String   @id @default(cuid())
+  title    String
+  score    Float
+  maxScore Float    @default(10)
+  weight   Float    @default(100)
+  gradedAt DateTime @default(now())
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId, gradedAt])
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  startsAt    DateTime
+  endsAt      DateTime?
+  location    String?
+  type        String    @default("STUDY")
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  subjectId String?
+  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, startsAt])
+  @@index([subjectId])
 }

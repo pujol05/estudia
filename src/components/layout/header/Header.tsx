@@ -2,19 +2,16 @@
 // import Header from "@/components/layout/Header/Header";
 
 import { headers } from "next/headers"
-import { getTranslations } from "next-intl/server";
-
 import { auth } from "@/lib/auth";
 import { Link } from "@/i18n/navigation";
 
 import styles from "./Header.module.css";
 
 import HeaderActions from "./HeaderActions";
+import NavigationLinks from "./NavigationLinks";
 
 // posem sytles.header , nav ...pq tenim un fitxer css 
 export default async function Header() {
-
-  const t = await getTranslations("Navigation");
 
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -26,13 +23,7 @@ export default async function Header() {
                 <Link href="/" className={styles.logo}>
                     Estudia
                 </Link>
-                <nav className={styles.navigation}>
-                    <Link href="/">{t("home")}</Link>
-                    <Link href="/subjects">{t("subjects")}</Link>
-                    <Link href="/tasks">{t("tasks")}</Link>
-                    <Link href="/exams">{t("exams")}</Link>
-                    <Link href="/grades">{t("grades")}</Link>
-                </nav>
+                {session && <NavigationLinks />}
                 <div className={styles.actions}>
                     <HeaderActions
                         user={session ? {

@@ -42,6 +42,10 @@ export default function Footer() {
             <li>
               <Link href="/grades">{tNav("grades")}</Link>
             </li>
+
+            <li>
+              <Link href="/events">{tNav("events")}</Link>
+            </li>
           </ul>
 
           <ul className={styles.links}>

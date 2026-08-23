@@ -6,7 +6,7 @@
 
 .container {
   max-width: 1200px;
-  height: 72px;
+  min-height: 72px;
 
   margin: 0 auto;
   padding: 0 32px;
@@ -29,10 +29,11 @@
   display: flex;
   align-items: center;
 
-  gap: 36px;
+  gap: 24px;
 }
 
 .navigation a {
+  position: relative;
   color: var(--header-text);
 
   font-size: 15px;
@@ -42,6 +43,25 @@
   white-space: nowrap;
 
   transition: color 0.2s ease;
+}
+
+.navigation a::after {
+  position: absolute;
+  right: 0;
+  bottom: -10px;
+  left: 0;
+  height: 2px;
+  background: transparent;
+  border-radius: 999px;
+  content: "";
+}
+
+.navigation .activeLink {
+  color: var(--color-white);
+}
+
+.navigation .activeLink::after {
+  background: #53b6e3;
 }
 
 .navigation a:hover {
@@ -86,4 +106,44 @@
   border-radius: 7px;
 
   color: var(--color-white) !important;
+}
+
+@media (max-width: 1040px) {
+  .container {
+    flex-wrap: wrap;
+    gap: 0 20px;
+    padding-top: 12px;
+  }
+
+  .navigation {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    gap: 22px;
+    padding: 15px 0 13px;
+    scrollbar-width: none;
+  }
+
+  .navigation::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navigation a::after {
+    bottom: -8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .navigation {
+    gap: 20px;
+  }
+
+  .navigation a {
+    font-size: 14px;
+  }
 }
