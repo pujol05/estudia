@@ -22,7 +22,7 @@ export default async function ExamsPage({ params }: Props) {
       orderBy: [{ completed: "asc" }, { examDate: "asc" }],
       select: {
         id: true, title: true, description: true, examDate: true,
-        type: true, completed: true, score: true,
+        type: true, completed: true,
         subject: { select: { id: true, name: true } },
       },
     }),

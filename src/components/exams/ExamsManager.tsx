@@ -11,7 +11,7 @@ import type { ExamSummary, ExamType, SubjectOption } from "@/lib/academic-types"
 type Props = { referenceTime: string; initialSubjects: SubjectOption[]; initialExams: ExamSummary[] };
 type ExamFilter = "upcoming" | "past" | "all";
 
-const EMPTY_FORM: ExamInput = { title: "", description: "", examDate: "", type: "FINAL", completed: false, score: null, subjectId: "" };
+const EMPTY_FORM: ExamInput = { title: "", description: "", examDate: "", type: "FINAL", completed: false, subjectId: "" };
 
 function toDateTimeInput(value: string) {
   const date = new Date(value);
@@ -61,7 +61,7 @@ export default function ExamsManager({ referenceTime, initialSubjects, initialEx
 
   function openEdit(exam: ExamSummary) {
     setEditingId(exam.id);
-    setForm({ title: exam.title, description: exam.description ?? "", examDate: toDateTimeInput(exam.examDate), type: exam.type, completed: exam.completed, score: exam.score, subjectId: exam.subject.id });
+    setForm({ title: exam.title, description: exam.description ?? "", examDate: toDateTimeInput(exam.examDate), type: exam.type, completed: exam.completed, subjectId: exam.subject.id });
     setFeedback(null); setEditorOpen(true);
   }
 
@@ -106,7 +106,7 @@ export default function ExamsManager({ referenceTime, initialSubjects, initialEx
           {filteredExams.map((exam) => <article className={styles.item} key={exam.id}>
             <div className={styles.itemMain}><div className={styles.itemIcon}>E</div><div className={styles.itemText}><h2 className={styles.itemTitle}>{exam.subject.name}</h2><p className={styles.itemDescription}>{exam.title}{exam.description ? ` · ${exam.description}` : ""}</p></div></div>
             <div className={styles.itemMeta}><strong>{formatter.format(new Date(exam.examDate))}</strong>{exam.completed ? t("completed") : t("scheduled")}</div>
-            <span className={`${styles.badge} ${exam.score !== null ? (exam.score >= 5 ? styles.badgeSuccess : styles.badgeDanger) : ""}`}>{exam.score !== null ? `${exam.score.toLocaleString(locale)}/10` : typeLabel(exam.type)}</span>
+            <span className={styles.badge}>{typeLabel(exam.type)}</span>
             <div className={styles.itemActions}><button className={styles.secondaryButton} type="button" onClick={() => openEdit(exam)} disabled={busy}>{common("edit")}</button><button className={styles.dangerButton} type="button" onClick={() => setDeletingExam(exam)} disabled={busy}>{common("delete")}</button></div>
           </article>)}
         </section>
@@ -118,7 +118,6 @@ export default function ExamsManager({ referenceTime, initialSubjects, initialEx
         <div className={styles.field}><label htmlFor="exam-type">{t("type")}</label><select id="exam-type" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as ExamType })}><option value="FINAL">{t("typeFinal")}</option><option value="MIDTERM">{t("typeMidterm")}</option><option value="PRACTICAL">{t("typePractical")}</option><option value="ORAL">{t("typeOral")}</option><option value="OTHER">{t("typeOther")}</option></select></div>
         <div className={styles.field}><label htmlFor="exam-date">{t("date")}</label><input id="exam-date" type="datetime-local" value={form.examDate} onInput={(e) => setForm({ ...form, examDate: e.currentTarget.value })} onChange={(e) => setForm({ ...form, examDate: e.currentTarget.value })} required /></div>
         <div className={styles.field}><label htmlFor="exam-status">{common("status")}</label><select id="exam-status" value={form.completed ? "completed" : "scheduled"} onChange={(e) => setForm({ ...form, completed: e.target.value === "completed" })}><option value="scheduled">{t("scheduled")}</option><option value="completed">{t("completed")}</option></select></div>
-        <div className={styles.field}><label htmlFor="exam-score">{t("score")}</label><input id="exam-score" type="number" min="0" max="10" step="0.01" value={form.score ?? ""} onChange={(e) => setForm({ ...form, score: e.target.value === "" ? null : Number(e.target.value) })} /></div>
         <div className={`${styles.field} ${styles.fieldWide}`}><label htmlFor="exam-description">{common("description")}</label><textarea id="exam-description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} maxLength={600} /></div>
       </div><div className={styles.formActions}><button className={styles.secondaryButton} type="button" onClick={() => setEditorOpen(false)} disabled={busy}>{common("cancel")}</button><button className={styles.primaryButton} type="submit" disabled={busy}>{busy ? common("saving") : common("save")}</button></div></form></div></div>}
 

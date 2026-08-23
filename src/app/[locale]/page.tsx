@@ -27,12 +27,16 @@ export default async function Home({ params }: Props) {
         id: true,
         name: true,
         tasks: { select: { completed: true } },
-        _count: { select: { exams: true, grades: true } },
       },
     }),
     prisma.grade.findMany({
-      where: { subject: { userId: session.user.id } },
-      select: { score: true, maxScore: true, weight: true, subjectId: true },
+      where: { exam: { subject: { userId: session.user.id } } },
+      select: {
+        score: true,
+        maxScore: true,
+        weight: true,
+        exam: { select: { subjectId: true } },
+      },
     }),
     prisma.task.findMany({
       where: { completed: false, dueDate: { not: null }, subject: { userId: session.user.id } },
@@ -64,7 +68,7 @@ export default async function Home({ params }: Props) {
   const subjectProgress = subjects.map((subject) => {
     const completed = subject.tasks.filter((task) => task.completed).length;
     const progress = subject.tasks.length > 0 ? Math.round((completed / subject.tasks.length) * 100) : 0;
-    const subjectGrades = grades.filter((grade) => grade.subjectId === subject.id);
+    const subjectGrades = grades.filter((grade) => grade.exam.subjectId === subject.id);
     const weight = subjectGrades.reduce((sum, grade) => sum + grade.weight, 0);
     const subjectAverage = weight > 0 ? subjectGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore) * 10 * grade.weight, 0) / weight : null;
     return { ...subject, progress, subjectAverage };

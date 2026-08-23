@@ -12,14 +12,38 @@ export default async function GradesPage({ params }: Props) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect(`/${locale}/login`);
 
-  const [subjects, grades] = await Promise.all([
-    prisma.subject.findMany({ where: { userId: session.user.id }, orderBy: { name: "asc" }, select: { id: true, name: true } }),
-    prisma.grade.findMany({
+  const [subjects, exams] = await Promise.all([
+    prisma.subject.findMany({
+      where: { userId: session.user.id },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.exam.findMany({
       where: { subject: { userId: session.user.id } },
-      orderBy: { gradedAt: "desc" },
-      select: { id: true, title: true, score: true, maxScore: true, weight: true, gradedAt: true, subject: { select: { id: true, name: true } } },
+      orderBy: { examDate: "desc" },
+      select: {
+        id: true,
+        title: true,
+        examDate: true,
+        subject: { select: { id: true, name: true } },
+        grade: { select: { id: true, score: true, maxScore: true, weight: true } },
+      },
     }),
   ]);
 
-  return <GradesManager initialSubjects={subjects} initialGrades={grades.map((grade) => ({ ...grade, gradedAt: grade.gradedAt.toISOString() }))} />;
+  return (
+    <GradesManager
+      initialSubjects={subjects}
+      initialGrades={exams.map((exam) => ({
+        id: exam.grade?.id ?? null,
+        examId: exam.id,
+        title: exam.title,
+        examDate: exam.examDate.toISOString(),
+        score: exam.grade?.score ?? null,
+        maxScore: exam.grade?.maxScore ?? 10,
+        weight: exam.grade?.weight ?? 100,
+        subject: exam.subject,
+      }))}
+    />
+  );
 }

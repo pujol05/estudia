@@ -4,7 +4,6 @@ import {
   getAuthenticatedUserId,
   normalizeOptionalText,
   normalizeRequiredText,
-  parseNumberInRange,
   parseRequiredDate,
   subjectBelongsToUser,
   type AcademicActionError,
@@ -20,7 +19,6 @@ export type ExamInput = {
   examDate: string;
   type: ExamType;
   completed: boolean;
-  score: number | null;
   subjectId: string;
 };
 
@@ -39,7 +37,6 @@ function serializeExam(exam: {
   examDate: Date;
   type: string;
   completed: boolean;
-  score: number | null;
   subject: { id: string; name: string };
 }): ExamSummary {
   return {
@@ -54,13 +51,11 @@ function validateInput(input: ExamInput) {
   const description = normalizeOptionalText(input.description, 600);
   const examDate = parseRequiredDate(input.examDate);
   const type = EXAM_TYPES.includes(input.type) ? input.type : null;
-  const score = input.score === null ? null : parseNumberInRange(input.score, 0, 10);
-
-  if (!title || description === undefined || !examDate || !type || (input.score !== null && score === null) || typeof input.completed !== "boolean") {
+  if (!title || description === undefined || !examDate || !type || typeof input.completed !== "boolean") {
     return null;
   }
 
-  return { title, description, examDate, type, completed: input.completed, score };
+  return { title, description, examDate, type, completed: input.completed };
 }
 
 export async function createExamAction(input: ExamInput): Promise<ExamResult> {
@@ -76,7 +71,7 @@ export async function createExamAction(input: ExamInput): Promise<ExamResult> {
       data: { ...data, subjectId: input.subjectId },
       select: {
         id: true, title: true, description: true, examDate: true,
-        type: true, completed: true, score: true,
+        type: true, completed: true,
         subject: { select: { id: true, name: true } },
       },
     });
@@ -106,7 +101,7 @@ export async function updateExamAction(examId: string, input: ExamInput): Promis
       where: { id: examId, subject: { userId } },
       select: {
         id: true, title: true, description: true, examDate: true,
-        type: true, completed: true, score: true,
+        type: true, completed: true,
         subject: { select: { id: true, name: true } },
       },
     });

@@ -24,17 +24,17 @@ export type ExamSummary = {
   examDate: string;
   type: ExamType;
   completed: boolean;
-  score: number | null;
   subject: SubjectOption;
 };
 
 export type GradeSummary = {
-  id: string;
+  id: string | null;
+  examId: string;
   title: string;
-  score: number;
+  examDate: string;
+  score: number | null;
   maxScore: number;
   weight: number;
-  gradedAt: string;
   subject: SubjectOption;
 };
 

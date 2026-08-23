@@ -86,7 +86,6 @@ model Subject {
 
   tasks  Task[]
   exams  Exam[]
-  grades Grade[]
   events Event[]
 
   createdAt DateTime @default(now())
@@ -119,10 +118,10 @@ model Exam {
   examDate    DateTime
   type        String   @default("FINAL")
   completed   Boolean  @default(false)
-  score       Float?
 
   subjectId String
   subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  grade     Grade?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,20 +130,16 @@ model Exam {
 }
 
 model Grade {
-  id       String   @id @default(cuid())
-  title    String
+  id       String @id @default(cuid())
   score    Float
-  maxScore Float    @default(10)
-  weight   Float    @default(100)
-  gradedAt DateTime @default(now())
+  maxScore Float  @default(10)
+  weight   Float  @default(100)
 
-  subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  examId String @unique
+  exam   Exam   @relation(fields: [examId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([subjectId, gradedAt])
 }
 
 model Event {
