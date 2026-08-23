@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import TasksManager from "@/components/tasks/TasksManager";
-import type { TaskPriority } from "@/lib/academic-types";
+import type { TaskPriority, TaskStatus } from "@/lib/academic-types";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -26,15 +26,20 @@ export default async function TasksPage({ params }: Props) {
     }),
     prisma.task.findMany({
       where: { subject: { userId: session.user.id } },
-      orderBy: [{ completed: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }],
+      orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }],
       select: {
         id: true,
         title: true,
         description: true,
         dueDate: true,
         completed: true,
+        status: true,
         priority: true,
         subject: { select: { id: true, name: true } },
+        timeEntries: {
+          orderBy: [{ date: "desc" }, { createdAt: "desc" }],
+          select: { id: true, date: true, minutes: true },
+        },
       },
     }),
   ]);
@@ -46,6 +51,11 @@ export default async function TasksPage({ params }: Props) {
         ...task,
         dueDate: task.dueDate?.toISOString() ?? null,
         priority: task.priority as TaskPriority,
+        status: task.status as TaskStatus,
+        timeEntries: task.timeEntries.map((entry) => ({
+          ...entry,
+          date: entry.date.toISOString().slice(0, 10),
+        })),
       }))}
     />
   );

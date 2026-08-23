@@ -100,15 +100,32 @@ model Task {
   description String?
   dueDate     DateTime?
   completed   Boolean   @default(false)
+  status      String    @default("TODO")
   priority    String    @default("MEDIUM")
 
-  subjectId String
-  subject   Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  timeEntries TaskTimeEntry[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([subjectId, dueDate])
+  @@index([subjectId, status])
+}
+
+model TaskTimeEntry {
+  id      String   @id @default(cuid())
+  date    DateTime @db.Date
+  minutes Int
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([taskId, date])
 }
 
 model Exam {

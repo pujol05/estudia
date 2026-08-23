@@ -4,6 +4,13 @@ export type SubjectOption = {
 };
 
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
+export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
+
+export type TaskTimeEntrySummary = {
+  id: string;
+  date: string;
+  minutes: number;
+};
 
 export type TaskSummary = {
   id: string;
@@ -11,8 +18,10 @@ export type TaskSummary = {
   description: string | null;
   dueDate: string | null;
   completed: boolean;
+  status: TaskStatus;
   priority: TaskPriority;
   subject: SubjectOption;
+  timeEntries: TaskTimeEntrySummary[];
 };
 
 export type ExamType = "FINAL" | "MIDTERM" | "PRACTICAL" | "ORAL" | "OTHER";
