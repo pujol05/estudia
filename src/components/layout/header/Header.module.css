@@ -16,15 +16,6 @@
   justify-content: space-between;
 }
 
-.logo {
-  color: var(--header-text);
-  font-size: 22px;
-  font-weight: 700;
-
-  text-decoration: none;
-  white-space: nowrap;
-}
-
 .navigation {
   display: flex;
   align-items: center;

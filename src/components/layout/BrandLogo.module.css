@@ -1,0 +1,52 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--header-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mark {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 16%);
+}
+
+.image {
+  object-fit: cover;
+  transform: scale(1.25);
+}
+
+.name {
+  color: var(--header-text);
+  font-size: 22px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.brand:hover .name {
+  color: var(--color-white);
+}
+
+.brand:focus-visible {
+  outline: 2px solid #57b9ff;
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+
+.compact {
+  gap: 0;
+}
+
+.compact .mark {
+  width: 36px;
+  height: 36px;
+  flex-basis: 36px;
+  border-radius: 10px;
+  box-shadow: none;
+}

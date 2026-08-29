@@ -23,7 +23,6 @@ type Props = {
   initialName: string;
   initialEmail: string;
   initialImage: string | null;
-  initialBirthDate: string;
 };
 
 export default function ProfileForm({
@@ -31,7 +30,6 @@ export default function ProfileForm({
   initialName,
   initialEmail,
   initialImage,
-  initialBirthDate,
 }: Props) {
   const t = useTranslations("Profile");
   const router = useRouter();
@@ -40,7 +38,6 @@ export default function ProfileForm({
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
   const [savedEmail, setSavedEmail] = useState(initialEmail);
-  const [birthDate, setBirthDate] = useState(initialBirthDate);
   const [image, setImage] = useState(initialImage);
   const [isUpdatingImage, setIsUpdatingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -48,8 +45,6 @@ export default function ProfileForm({
   const [success, setSuccess] = useState("");
 
   const initial = name.trim().charAt(0).toUpperCase() || "?";
-  const today = new Date().toISOString().slice(0, 10);
-
   async function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -151,11 +146,6 @@ export default function ProfileForm({
       return;
     }
 
-    if (birthDate && (birthDate < "1900-01-01" || birthDate > today)) {
-      setError(t("birthDateError"));
-      return;
-    }
-
     setIsSaving(true);
 
     try {
@@ -172,9 +162,6 @@ export default function ProfileForm({
 
       const { error: updateError } = await authClient.updateUser({
         name: normalizedName,
-        birthDate: birthDate
-          ? new Date(`${birthDate}T00:00:00.000Z`)
-          : null,
       });
 
       if (updateError) {
@@ -288,18 +275,6 @@ export default function ProfileForm({
               <p>{t("emailHelp")}</p>
             </div>
 
-            <div className={styles.field}>
-              <label htmlFor="profile-birth-date">{t("birthDate")}</label>
-              <input
-                id="profile-birth-date"
-                type="date"
-                value={birthDate}
-                onChange={(event) => setBirthDate(event.target.value)}
-                min="1900-01-01"
-                max={today}
-                autoComplete="bday"
-              />
-            </div>
           </div>
         </section>
 

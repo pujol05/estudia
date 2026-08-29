@@ -3,10 +3,10 @@
 
 import { headers } from "next/headers"
 import { auth } from "@/lib/auth";
-import { Link } from "@/i18n/navigation";
 
 import styles from "./Header.module.css";
 
+import BrandLogo from "@/components/layout/BrandLogo";
 import HeaderActions from "./HeaderActions";
 import NavigationLinks from "./NavigationLinks";
 
@@ -20,9 +20,7 @@ export default async function Header() {
     return (
         <header className={styles.header}>
             <div className={styles.container}>
-                <Link href="/" className={styles.logo}>
-                    Estudia
-                </Link>
+                <BrandLogo priority />
                 {session && <NavigationLinks />}
                 <div className={styles.actions}>
                     <HeaderActions

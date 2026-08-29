@@ -98,6 +98,25 @@
   font-size: 14px;
 }
 
+.privacyNotice {
+  color: #667780;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.privacyNotice a {
+  color: var(--color-primary);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.privacyNotice a:focus-visible {
+  outline: 2px solid #57b9ff;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .switch {
   margin-top: 24px;
 

@@ -4,5 +4,6 @@ import { defineRouting } from "next-intl/routing";
 // defaultLocale : idioma per defecte de la web.
 export const routing = defineRouting({
   locales: ["ca", "es", "en"],
-  defaultLocale: "ca"
+  defaultLocale: "ca",
+  localeDetection: false
 });

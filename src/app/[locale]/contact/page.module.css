@@ -1,0 +1,41 @@
+.page {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 64px 32px 80px;
+}
+
+.page header {
+  margin-bottom: 26px;
+}
+
+.page h1 {
+  margin-bottom: 10px;
+  color: var(--color-dark);
+  font-size: 36px;
+  letter-spacing: -0.03em;
+}
+
+.page header p {
+  color: #52656e;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.privacyNote {
+  margin-top: 14px;
+  color: #687980;
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 40px 20px 56px;
+  }
+
+  .page h1 {
+    font-size: 31px;
+  }
+}

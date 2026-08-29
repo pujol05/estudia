@@ -1,0 +1,118 @@
+.form {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 32px;
+  overflow: hidden;
+  background: var(--color-white);
+  border: 1px solid #d8dddf;
+  border-radius: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  color: var(--color-dark);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--color-white);
+  color: var(--color-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: 2px solid #57b9ff;
+  outline-offset: 1px;
+}
+
+.field p {
+  color: #6a7980;
+  font-size: 12px;
+}
+
+.form button {
+  align-self: flex-end;
+  min-width: 140px;
+  padding: 12px 20px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form button:hover {
+  filter: brightness(0.96);
+}
+
+.form button:focus-visible {
+  outline: 2px solid #57b9ff;
+  outline-offset: 3px;
+}
+
+.form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error,
+.success {
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.error {
+  background: #fff2f0;
+  color: #9b2c20;
+}
+
+.success {
+  background: #eef8f2;
+  color: #246347;
+}
+
+.honeypot {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.turnstile {
+  min-height: 65px;
+}
+
+@media (max-width: 640px) {
+  .form {
+    padding: 24px;
+  }
+
+  .form button {
+    width: 100%;
+  }
+}

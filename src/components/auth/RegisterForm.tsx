@@ -132,6 +132,11 @@ export default function RegisterForm() {
             </p>
           )}
 
+          <p className={styles.privacyNotice}>
+            {t("privacyBefore")} <Link href="/privacy">{t("privacyLink")}</Link>{" "}
+            {t("privacyAfter")}
+          </p>
+
           <button
             type="submit"
             className={styles.submit}

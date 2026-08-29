@@ -25,7 +25,6 @@ export default async function ProfilePage({ params }: Props) {
       name: true,
       email: true,
       image: true,
-      birthDate: true,
     },
   });
 
@@ -39,7 +38,6 @@ export default async function ProfilePage({ params }: Props) {
       initialName={user.name}
       initialEmail={user.email}
       initialImage={user.image}
-      initialBirthDate={user.birthDate?.toISOString().slice(0, 10) ?? ""}
     />
   );
 }
