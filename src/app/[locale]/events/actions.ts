@@ -9,10 +9,11 @@ import {
   subjectBelongsToUser,
   type AcademicActionError,
 } from "@/lib/academic";
-import type { EventSummary, EventType } from "@/lib/academic-types";
+import type { EventRecurrence, EventSummary, EventType } from "@/lib/academic-types";
 import prisma from "@/lib/prisma";
 
 const EVENT_TYPES: EventType[] = ["STUDY", "CLASS", "DEADLINE", "PERSONAL", "OTHER"];
+const EVENT_RECURRENCES: EventRecurrence[] = ["NONE", "WEEKLY", "BIWEEKLY", "MONTHLY"];
 
 export type EventInput = {
   title: string;
@@ -21,6 +22,8 @@ export type EventInput = {
   endsAt: string | null;
   location: string;
   type: EventType;
+  recurrence: EventRecurrence;
+  recurrenceUntil: string | null;
   subjectId: string | null;
 };
 
@@ -40,6 +43,8 @@ function serializeEvent(event: {
   endsAt: Date | null;
   location: string | null;
   type: string;
+  recurrence: string;
+  recurrenceUntil: Date | null;
   subject: { id: string; name: string } | null;
 }): EventSummary {
   return {
@@ -47,6 +52,8 @@ function serializeEvent(event: {
     startsAt: event.startsAt.toISOString(),
     endsAt: event.endsAt?.toISOString() ?? null,
     type: event.type as EventType,
+    recurrence: event.recurrence as EventRecurrence,
+    recurrenceUntil: event.recurrenceUntil?.toISOString() ?? null,
   };
 }
 
@@ -57,12 +64,15 @@ function validateInput(input: EventInput) {
   const startsAt = parseRequiredDate(input.startsAt);
   const endsAt = parseOptionalDate(input.endsAt);
   const type = EVENT_TYPES.includes(input.type) ? input.type : null;
+  const recurrence = EVENT_RECURRENCES.includes(input.recurrence) ? input.recurrence : null;
+  const parsedRecurrenceUntil = parseOptionalDate(input.recurrenceUntil);
+  const recurrenceUntil = recurrence === "NONE" ? null : parsedRecurrenceUntil;
 
-  if (!title || description === undefined || location === undefined || !startsAt || !type || (endsAt && endsAt < startsAt)) {
+  if (!title || description === undefined || location === undefined || !startsAt || !type || !recurrence || (endsAt && endsAt < startsAt) || (recurrenceUntil && recurrenceUntil < startsAt)) {
     return null;
   }
 
-  return { title, description, location, startsAt, endsAt, type };
+  return { title, description, location, startsAt, endsAt, type, recurrence, recurrenceUntil };
 }
 
 async function validSubject(subjectId: string | null, userId: string) {
@@ -79,7 +89,7 @@ export async function createEventAction(input: EventInput): Promise<EventResult>
   try {
     const event = await prisma.event.create({
       data: { ...data, userId, subjectId: input.subjectId },
-      select: { id: true, title: true, description: true, startsAt: true, endsAt: true, location: true, type: true, subject: { select: { id: true, name: true } } },
+      select: { id: true, title: true, description: true, startsAt: true, endsAt: true, location: true, type: true, recurrence: true, recurrenceUntil: true, subject: { select: { id: true, name: true } } },
     });
     return { ok: true, event: serializeEvent(event) };
   } catch (error) {
@@ -100,7 +110,7 @@ export async function updateEventAction(eventId: string, input: EventInput): Pro
     if (result.count === 0) return { ok: false, error: "notFound" };
     const event = await prisma.event.findFirst({
       where: { id: eventId, userId },
-      select: { id: true, title: true, description: true, startsAt: true, endsAt: true, location: true, type: true, subject: { select: { id: true, name: true } } },
+      select: { id: true, title: true, description: true, startsAt: true, endsAt: true, location: true, type: true, recurrence: true, recurrenceUntil: true, subject: { select: { id: true, name: true } } },
     });
     return event ? { ok: true, event: serializeEvent(event) } : { ok: false, error: "notFound" };
   } catch (error) {

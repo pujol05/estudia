@@ -48,6 +48,7 @@ export type GradeSummary = {
 };
 
 export type EventType = "STUDY" | "CLASS" | "DEADLINE" | "PERSONAL" | "OTHER";
+export type EventRecurrence = "NONE" | "WEEKLY" | "BIWEEKLY" | "MONTHLY";
 
 export type EventSummary = {
   id: string;
@@ -57,5 +58,7 @@ export type EventSummary = {
   endsAt: string | null;
   location: string | null;
   type: EventType;
+  recurrence: EventRecurrence;
+  recurrenceUntil: string | null;
   subject: SubjectOption | null;
 };

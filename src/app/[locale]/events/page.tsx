@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 
 import EventsManager from "@/components/events/EventsManager";
 import { redirect } from "@/i18n/navigation";
-import type { EventType } from "@/lib/academic-types";
+import type { EventRecurrence, EventType } from "@/lib/academic-types";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -18,9 +18,9 @@ export default async function EventsPage({ params }: Props) {
     prisma.event.findMany({
       where: { userId: session.user.id },
       orderBy: { startsAt: "asc" },
-      select: { id: true, title: true, description: true, startsAt: true, endsAt: true, location: true, type: true, subject: { select: { id: true, name: true } } },
+      select: { id: true, title: true, description: true, startsAt: true, endsAt: true, location: true, type: true, recurrence: true, recurrenceUntil: true, subject: { select: { id: true, name: true } } },
     }),
   ]);
 
-  return <EventsManager referenceTime={new Date().toISOString()} initialSubjects={subjects} initialEvents={events.map((event) => ({ ...event, startsAt: event.startsAt.toISOString(), endsAt: event.endsAt?.toISOString() ?? null, type: event.type as EventType }))} />;
+  return <EventsManager referenceTime={new Date().toISOString()} initialSubjects={subjects} initialEvents={events.map((event) => ({ ...event, startsAt: event.startsAt.toISOString(), endsAt: event.endsAt?.toISOString() ?? null, recurrenceUntil: event.recurrenceUntil?.toISOString() ?? null, type: event.type as EventType, recurrence: event.recurrence as EventRecurrence }))} />;
 }

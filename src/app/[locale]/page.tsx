@@ -66,6 +66,21 @@ export default async function Home({ params }: Props) {
     : null;
   const formatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const firstName = session.user.name.trim().split(/\s+/)[0];
+  const reminderLimit = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1_000);
+  const reminders = [
+    ...upcomingTasks.filter((task) => task.dueDate && task.dueDate <= reminderLimit).map((task) => ({ id: task.id, title: task.title, subject: task.subject.name, date: task.dueDate!, type: "task" as const, href: "/tasks" as const })),
+    ...upcomingExams.filter((exam) => exam.examDate <= reminderLimit).map((exam) => ({ id: exam.id, title: exam.title, subject: exam.subject.name, date: exam.examDate, type: "exam" as const, href: "/exams" as const })),
+  ].sort((left, right) => left.date.getTime() - right.date.getTime()).slice(0, 3);
+
+  function reminderDate(date: Date) {
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const difference = Math.round((target.getTime() - today.getTime()) / (24 * 60 * 60 * 1_000));
+    if (difference < 0) return t("reminderOverdue");
+    if (difference === 0) return t("reminderToday");
+    if (difference === 1) return t("reminderTomorrow");
+    return t("reminderInDays", { count: difference });
+  }
 
   const subjectProgress = subjects.map((subject) => {
     const completed = subject.tasks.filter((task) => task.completed).length;
@@ -86,6 +101,11 @@ export default async function Home({ params }: Props) {
       </header>
 
       {needsOnboarding && <Onboarding initialSubjects={subjects.map(({ id, name }) => ({ id, name }))} />}
+
+      {reminders.length > 0 && <section className={styles.reminders} aria-labelledby="dashboard-reminders-title">
+        <header className={styles.remindersHeading}><span aria-hidden="true">!</span><div><h2 id="dashboard-reminders-title">{t("remindersTitle")}</h2><p>{t("remindersSubtitle")}</p></div></header>
+        <div className={styles.reminderList}>{reminders.map((reminder) => <Link className={styles.reminder} href={reminder.href} key={`${reminder.type}-${reminder.id}`}><span className={`${styles.reminderType} ${reminder.type === "exam" ? styles.reminderExam : ""}`}>{t(reminder.type === "task" ? "reminderTask" : "reminderExam")}</span><span className={styles.reminderText}><strong>{reminder.title}</strong><small>{reminder.subject}</small></span><time className={reminder.date < now ? styles.reminderUrgent : ""} dateTime={reminder.date.toISOString()}>{reminderDate(reminder.date)}</time></Link>)}</div>
+      </section>}
 
       <section className={styles.kpis} aria-label={t("summaryLabel")}>
         <article className={styles.kpi}><span className={`${styles.kpiIcon} ${styles.blue}`}>✓</span><div><strong>{pendingTaskCount}</strong><span>{t("pendingTasks")}</span><small>{t("pendingTasksHint")}</small></div></article>

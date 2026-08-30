@@ -1,0 +1,3 @@
+ALTER TABLE "Event"
+ADD COLUMN "recurrence" TEXT NOT NULL DEFAULT 'NONE',
+ADD COLUMN "recurrenceUntil" TIMESTAMP(3);

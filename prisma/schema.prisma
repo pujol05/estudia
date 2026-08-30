@@ -159,13 +159,15 @@ model Grade {
 }
 
 model Event {
-  id          String    @id @default(cuid())
-  title       String
-  description String?
-  startsAt    DateTime
-  endsAt      DateTime?
-  location    String?
-  type        String    @default("STUDY")
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  startsAt        DateTime
+  endsAt          DateTime?
+  location        String?
+  type            String    @default("STUDY")
+  recurrence      String    @default("NONE")
+  recurrenceUntil DateTime?
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
