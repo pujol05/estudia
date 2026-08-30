@@ -98,6 +98,30 @@
   font-size: 14px;
 }
 
+.success {
+  color: #246347;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.result a,
+.auxiliaryLink a {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.auxiliaryLink {
+  margin-top: -8px;
+  text-align: right;
+  font-size: 13px;
+}
+
 .privacyNotice {
   color: #667780;
   font-size: 12px;

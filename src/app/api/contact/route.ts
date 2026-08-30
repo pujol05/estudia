@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
 
+import { sendEmail } from "@/lib/email";
+import { verifyTurnstileToken } from "@/lib/turnstile";
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 5;
@@ -10,27 +13,6 @@ type RateLimitEntry = {
 };
 
 const rateLimitStore = new Map<string, RateLimitEntry>();
-
-type TurnstileVerification = {
-  success?: boolean;
-  action?: string;
-  hostname?: string;
-};
-
-function getRequestHostname(request: NextRequest) {
-  const forwardedHost = request.headers.get("x-forwarded-host") ?? request.headers.get("host");
-  const host = forwardedHost?.split(",")[0]?.trim();
-
-  if (!host) {
-    return null;
-  }
-
-  try {
-    return new URL(`https://${host}`).hostname.toLowerCase();
-  } catch {
-    return null;
-  }
-}
 
 function isSameOrigin(request: NextRequest) {
   const origin = request.headers.get("origin");
@@ -119,57 +101,17 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "invalid_fields" }, { status: 400 });
   }
 
-  const turnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+  const verification = await verifyTurnstileToken({
+    token: turnstileToken,
+    action: "contact",
+    headers: request.headers,
+  });
 
-  if (!turnstileSecret) {
-    console.error("Turnstile environment variable is not configured");
-    return Response.json({ error: "service_unavailable" }, { status: 503 });
-  }
-
-  if (!turnstileToken || turnstileToken.length > 2048) {
-    return Response.json({ error: "verification_failed" }, { status: 400 });
-  }
-
-  const verificationBody = new FormData();
-  verificationBody.set("secret", turnstileSecret);
-  verificationBody.set("response", turnstileToken);
-
-  const forwardedFor = request.headers.get("x-forwarded-for");
-  const clientIp = forwardedFor?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip");
-
-  if (clientIp) {
-    verificationBody.set("remoteip", clientIp);
-  }
-
-  let verification: TurnstileVerification;
-
-  try {
-    const verificationResponse = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      {
-        method: "POST",
-        body: verificationBody,
-        cache: "no-store",
-        signal: AbortSignal.timeout(8000),
-      },
-    );
-
-    if (!verificationResponse.ok) {
-      throw new Error(`Turnstile returned ${verificationResponse.status}`);
+  if (!verification.success) {
+    if (verification.reason === "unavailable") {
+      return Response.json({ error: "service_unavailable" }, { status: 503 });
     }
 
-    verification = await verificationResponse.json() as TurnstileVerification;
-  } catch (error) {
-    console.error("Turnstile verification failed", error);
-    return Response.json({ error: "service_unavailable" }, { status: 503 });
-  }
-
-  const requestHostname = getRequestHostname(request);
-  const hasInvalidHostname = process.env.NODE_ENV === "production" && (
-    !requestHostname || verification.hostname?.toLowerCase() !== requestHostname
-  );
-
-  if (!verification.success || verification.action !== "contact" || hasInvalidHostname) {
     return Response.json({ error: "verification_failed" }, { status: 400 });
   }
 
@@ -177,25 +119,19 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
   const toEmail = process.env.CONTACT_TO_EMAIL;
   const fromEmail = process.env.CONTACT_FROM_EMAIL;
 
-  if (!apiKey || !toEmail || !fromEmail) {
+  if (!process.env.RESEND_API_KEY || !toEmail || !fromEmail) {
     console.error("Contact form email environment variables are not configured");
     return Response.json({ error: "service_unavailable" }, { status: 503 });
   }
 
-  const emailResponse = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
+  try {
+    await sendEmail({
       from: fromEmail,
-      to: [toEmail],
-      reply_to: email,
+      to: toEmail,
+      replyTo: email,
       subject: `[Estudia] ${subject}`,
       text: [
         "Nou missatge des del formulari de contacte d'Estudia",
@@ -206,11 +142,9 @@ export async function POST(request: NextRequest) {
         "",
         message,
       ].join("\n"),
-    }),
-  });
-
-  if (!emailResponse.ok) {
-    console.error("Contact form email provider returned an error", emailResponse.status);
+    });
+  } catch (error) {
+    console.error("Contact form email provider returned an error", error);
     return Response.json({ error: "send_failed" }, { status: 502 });
   }
 

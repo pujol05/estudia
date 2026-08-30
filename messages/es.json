@@ -380,6 +380,7 @@
       "submit": "Iniciar sesión",
       "loading": "Iniciando sesión...",
       "invalidCredentials": "El correo o la contraseña no son correctos.",
+      "forgotPassword": "¿Has olvidado la contraseña?",
       "noAccount": "¿Todavía no tienes cuenta?",
       "register": "Crear cuenta"
     },
@@ -395,10 +396,42 @@
       "passwordsDoNotMatch": "Las contraseñas no coinciden.",
       "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
       "registerError": "No se ha podido crear la cuenta. Revisa los datos o prueba con otro correo.",
+      "verificationRequired": "Completa la verificación antes de crear la cuenta.",
+      "verificationError": "No se ha podido completar la verificación. Vuelve a intentarlo.",
+      "verificationUnavailable": "La verificación de seguridad no está configurada.",
       "privacyBefore": "Al crear la cuenta confirmas que tienes 14 años o más y que has leído la",
       "privacyLink": "información de privacidad",
       "privacyAfter": ".",
       "alreadyAccount": "¿Ya tienes cuenta?",
+      "login": "Iniciar sesión"
+    },
+    "forgotPassword": {
+      "title": "Recuperar contraseña",
+      "subtitle": "Introduce el correo de tu cuenta y te enviaremos un enlace para crear una contraseña nueva.",
+      "email": "Correo electrónico",
+      "submit": "Enviar enlace",
+      "loading": "Enviando...",
+      "success": "Si existe una cuenta con este correo, recibirás un enlace de recuperación. Revisa también la carpeta de correo no deseado.",
+      "requestError": "No se ha podido procesar la solicitud. Vuelve a intentarlo más tarde.",
+      "verificationRequired": "Completa la verificación antes de continuar.",
+      "verificationError": "No se ha podido completar la verificación. Vuelve a intentarlo.",
+      "verificationUnavailable": "La verificación de seguridad no está configurada.",
+      "backToLogin": "Volver a iniciar sesión"
+    },
+    "resetPassword": {
+      "title": "Crear una contraseña nueva",
+      "subtitle": "La contraseña debe tener al menos 8 caracteres.",
+      "password": "Contraseña nueva",
+      "confirmPassword": "Repite la contraseña",
+      "submit": "Guardar contraseña",
+      "loading": "Guardando...",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "resetError": "No se ha podido cambiar la contraseña. Es posible que el enlace haya caducado o ya se haya utilizado.",
+      "invalidTitle": "Enlace no válido",
+      "invalidText": "Este enlace de recuperación no es válido o ha caducado.",
+      "requestAgain": "Solicitar otro enlace",
+      "success": "La contraseña se ha actualizado correctamente. Ya puedes iniciar sesión.",
       "login": "Iniciar sesión"
     }
   }

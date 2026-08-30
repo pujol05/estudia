@@ -3,7 +3,8 @@
 import { FormEvent, useCallback, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-import TurnstileWidget from "./TurnstileWidget";
+import TurnstileWidget from "@/components/security/TurnstileWidget";
+
 import styles from "./ContactForm.module.css";
 
 export default function ContactForm() {
@@ -141,6 +142,7 @@ export default function ContactForm() {
           key={turnstileKey}
           siteKey={siteKey}
           locale={locale}
+          action="contact"
           onTokenChange={handleTurnstileToken}
           onError={handleTurnstileError}
         />

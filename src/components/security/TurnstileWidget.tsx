@@ -3,7 +3,9 @@
 import Script from "next/script";
 import { useCallback, useEffect, useRef } from "react";
 
-import styles from "./ContactForm.module.css";
+import type { TurnstileAction } from "@/lib/turnstile";
+
+import styles from "./TurnstileWidget.module.css";
 
 type TurnstileOptions = {
   sitekey: string;
@@ -29,6 +31,7 @@ declare global {
 type Props = {
   siteKey: string;
   locale: string;
+  action: TurnstileAction;
   onTokenChange: (token: string) => void;
   onError: () => void;
 };
@@ -36,6 +39,7 @@ type Props = {
 export default function TurnstileWidget({
   siteKey,
   locale,
+  action,
   onTokenChange,
   onError,
 }: Props) {
@@ -49,8 +53,8 @@ export default function TurnstileWidget({
 
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: siteKey,
-      action: "contact",
-      language: locale,
+      action,
+      language: locale === "ca" ? "es" : locale,
       theme: "light",
       callback: onTokenChange,
       "expired-callback": () => onTokenChange(""),
@@ -59,7 +63,7 @@ export default function TurnstileWidget({
         onError();
       },
     });
-  }, [locale, onError, onTokenChange, siteKey]);
+  }, [action, locale, onError, onTokenChange, siteKey]);
 
   useEffect(() => {
     renderWidget();
@@ -73,7 +77,7 @@ export default function TurnstileWidget({
   }, [renderWidget]);
 
   return (
-    <div className={styles.turnstile}>
+    <div className={styles.container}>
       <Script
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"

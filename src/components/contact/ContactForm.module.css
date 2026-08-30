@@ -103,10 +103,6 @@
   white-space: nowrap;
 }
 
-.turnstile {
-  min-height: 65px;
-}
-
 @media (max-width: 640px) {
   .form {
     padding: 24px;

@@ -380,6 +380,7 @@
       "submit": "Iniciar sessió",
       "loading": "Iniciant sessió...",
       "invalidCredentials": "El correu o la contrasenya no són correctes.",
+      "forgotPassword": "Has oblidat la contrasenya?",
       "noAccount": "Encara no tens compte?",
       "register": "Crear compte"
     },
@@ -395,10 +396,42 @@
       "passwordsDoNotMatch": "Les contrasenyes no coincideixen.",
       "passwordTooShort": "La contrasenya ha de tenir com a mínim 8 caràcters.",
       "registerError": "No s'ha pogut crear el compte. Revisa les dades o prova amb un altre correu.",
+      "verificationRequired": "Completa la verificació abans de crear el compte.",
+      "verificationError": "No s’ha pogut completar la verificació. Torna-ho a provar.",
+      "verificationUnavailable": "La verificació de seguretat no està configurada.",
       "privacyBefore": "En crear el compte confirmes que tens 14 anys o més i que has llegit la",
       "privacyLink": "informació de privacitat",
       "privacyAfter": ".",
       "alreadyAccount": "Ja tens compte?",
+      "login": "Iniciar sessió"
+    },
+    "forgotPassword": {
+      "title": "Recuperar contrasenya",
+      "subtitle": "Introdueix el correu del teu compte i t’enviarem un enllaç per crear una contrasenya nova.",
+      "email": "Correu electrònic",
+      "submit": "Enviar enllaç",
+      "loading": "Enviant...",
+      "success": "Si existeix un compte amb aquest correu, rebràs un enllaç de recuperació. Revisa també la carpeta de correu brossa.",
+      "requestError": "No s’ha pogut processar la sol·licitud. Torna-ho a provar més tard.",
+      "verificationRequired": "Completa la verificació abans de continuar.",
+      "verificationError": "No s’ha pogut completar la verificació. Torna-ho a provar.",
+      "verificationUnavailable": "La verificació de seguretat no està configurada.",
+      "backToLogin": "Tornar a iniciar sessió"
+    },
+    "resetPassword": {
+      "title": "Crear una contrasenya nova",
+      "subtitle": "La contrasenya ha de tenir com a mínim 8 caràcters.",
+      "password": "Contrasenya nova",
+      "confirmPassword": "Repeteix la contrasenya",
+      "submit": "Desar contrasenya",
+      "loading": "Desant...",
+      "passwordsDoNotMatch": "Les contrasenyes no coincideixen.",
+      "passwordTooShort": "La contrasenya ha de tenir com a mínim 8 caràcters.",
+      "resetError": "No s’ha pogut canviar la contrasenya. L’enllaç pot haver caducat o ja haver-se utilitzat.",
+      "invalidTitle": "Enllaç no vàlid",
+      "invalidText": "Aquest enllaç de recuperació no és vàlid o ha caducat.",
+      "requestAgain": "Demanar un altre enllaç",
+      "success": "La contrasenya s’ha actualitzat correctament. Ja pots iniciar sessió.",
       "login": "Iniciar sessió"
     }
   }

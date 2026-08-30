@@ -1,8 +1,9 @@
 "use client";
 
-import { SyntheticEvent, useState } from "react";
-import { useTranslations } from "next-intl";
+import { SyntheticEvent, useCallback, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
+import TurnstileWidget from "@/components/security/TurnstileWidget";
 import { authClient } from "@/lib/auth-client";
 import { Link, useRouter } from "@/i18n/navigation";
 
@@ -10,7 +11,9 @@ import styles from "./AuthForm.module.css";
 
 export default function RegisterForm() {
   const t = useTranslations("Auth.register");
+  const locale = useLocale();
   const router = useRouter();
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
   //quan luser escriu canvia de "" a name amb setName("input")
   const [name, setName] = useState("");
@@ -20,6 +23,25 @@ export default function RegisterForm() {
 
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileKey, setTurnstileKey] = useState(0);
+
+  const handleTurnstileToken = useCallback((token: string) => {
+    setTurnstileToken(token);
+
+    if (token) {
+      setError("");
+    }
+  }, []);
+
+  const handleTurnstileError = useCallback(() => {
+    setError(t("verificationError"));
+  }, [t]);
+
+  function resetTurnstile() {
+    setTurnstileToken("");
+    setTurnstileKey((currentKey) => currentKey + 1);
+  }
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,16 +58,27 @@ export default function RegisterForm() {
       return;
     }
 
+    if (!turnstileToken) {
+      setError(t("verificationRequired"));
+      return;
+    }
+
     setIsLoading(true);
 
     const { error } = await authClient.signUp.email({
       name,
       email,
       password,
+      fetchOptions: {
+        headers: {
+          "x-turnstile-token": turnstileToken,
+        },
+      },
     });
 
     if (error) {
       setError(t("registerError"));
+      resetTurnstile();
       setIsLoading(false);
       return;
     }
@@ -106,6 +139,7 @@ export default function RegisterForm() {
               onChange={(event) => setPassword(event.target.value)}
               required
               minLength={8}
+              maxLength={128}
               autoComplete="new-password"
             />
           </div>
@@ -122,9 +156,23 @@ export default function RegisterForm() {
               onChange={(event) => setConfirmPassword(event.target.value)}
               required
               minLength={8}
+              maxLength={128}
               autoComplete="new-password"
             />
           </div>
+
+          {siteKey ? (
+            <TurnstileWidget
+              key={turnstileKey}
+              siteKey={siteKey}
+              locale={locale}
+              action="register"
+              onTokenChange={handleTurnstileToken}
+              onError={handleTurnstileError}
+            />
+          ) : (
+            <p className={styles.error}>{t("verificationUnavailable")}</p>
+          )}
 
           {error && (
             <p className={styles.error}>
@@ -140,7 +188,7 @@ export default function RegisterForm() {
           <button
             type="submit"
             className={styles.submit}
-            disabled={isLoading}
+            disabled={isLoading || !turnstileToken}
           >
             {isLoading ? t("loading") : t("submit")}
           </button>

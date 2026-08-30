@@ -380,6 +380,7 @@
       "submit": "Sign in",
       "loading": "Signing in...",
       "invalidCredentials": "The email or password is incorrect.",
+      "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account yet?",
       "register": "Create account"
     },
@@ -395,10 +396,42 @@
       "passwordsDoNotMatch": "The passwords do not match.",
       "passwordTooShort": "The password must be at least 8 characters long.",
       "registerError": "The account could not be created. Check your details or try another email.",
+      "verificationRequired": "Complete the verification before creating the account.",
+      "verificationError": "The verification could not be completed. Please try again.",
+      "verificationUnavailable": "Security verification is not configured.",
       "privacyBefore": "By creating an account, you confirm that you are at least 14 and have read the",
       "privacyLink": "privacy information",
       "privacyAfter": ".",
       "alreadyAccount": "Already have an account?",
+      "login": "Sign in"
+    },
+    "forgotPassword": {
+      "title": "Recover password",
+      "subtitle": "Enter the email address for your account and we will send you a link to create a new password.",
+      "email": "Email address",
+      "submit": "Send recovery link",
+      "loading": "Sending...",
+      "success": "If an account exists for this email, you will receive a recovery link. Please also check your spam folder.",
+      "requestError": "The request could not be processed. Please try again later.",
+      "verificationRequired": "Complete the verification before continuing.",
+      "verificationError": "The verification could not be completed. Please try again.",
+      "verificationUnavailable": "Security verification is not configured.",
+      "backToLogin": "Back to sign in"
+    },
+    "resetPassword": {
+      "title": "Create a new password",
+      "subtitle": "Your password must be at least 8 characters long.",
+      "password": "New password",
+      "confirmPassword": "Repeat password",
+      "submit": "Save password",
+      "loading": "Saving...",
+      "passwordsDoNotMatch": "The passwords do not match.",
+      "passwordTooShort": "The password must be at least 8 characters long.",
+      "resetError": "The password could not be changed. The link may have expired or already been used.",
+      "invalidTitle": "Invalid link",
+      "invalidText": "This recovery link is invalid or has expired.",
+      "requestAgain": "Request another link",
+      "success": "Your password has been updated. You can now sign in.",
       "login": "Sign in"
     }
   }

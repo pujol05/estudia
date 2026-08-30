@@ -78,6 +78,10 @@ export default function LoginForm() {
             />
           </div>
 
+          <p className={styles.auxiliaryLink}>
+            <Link href="/forgot-password">{t("forgotPassword")}</Link>
+          </p>
+
           {error && (
             <p className={styles.error}>
               {error}
