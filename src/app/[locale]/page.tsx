@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import LandingPage from "@/components/landing/LandingPage";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -13,7 +13,7 @@ type Props = { params: Promise<{ locale: string }> };
 export default async function Home({ params }: Props) {
   const { locale } = await params;
   const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect(`/${locale}/login`);
+  if (!session) return <LandingPage />;
 
   const t = await getTranslations("Dashboard");
   const now = new Date();

@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import TasksManager from "@/components/tasks/TasksManager";
+import { redirect } from "@/i18n/navigation";
 import type { TaskPriority, TaskStatus } from "@/lib/academic-types";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -15,7 +15,7 @@ export default async function TasksPage({ params }: Props) {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session) {
-    redirect(`/${locale}/login`);
+    return redirect({ href: "/login", locale });
   }
 
   const [subjects, tasks] = await Promise.all([

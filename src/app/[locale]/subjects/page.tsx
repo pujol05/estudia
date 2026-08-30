@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 import SubjectsManager from "@/components/subjects/SubjectsManager";
+import { redirect } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -16,7 +16,7 @@ export default async function SubjectsPage({ params }: Props) {
   });
 
   if (!session) {
-    redirect(`/${locale}/login`);
+    return redirect({ href: "/login", locale });
   }
 
   const subjects = await prisma.subject.findMany({

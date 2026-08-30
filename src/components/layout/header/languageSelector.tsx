@@ -47,7 +47,7 @@ export default function LanguageSelector({ isOpen, onOpenChange }: Props) {
     router.replace(pathname, {
       locale: newLocale,
     });
-    //canvia el locale, de ca/tasks a es/tasks i tanca el menu desplegable d'idiomes. 
+    //canvia el locale, de /tasks a /es/tasks i tanca el menu desplegable d'idiomes.
     onOpenChange(false);
   }
 
