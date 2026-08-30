@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 
 import LandingPage from "@/components/landing/LandingPage";
+import Onboarding from "@/components/dashboard/Onboarding";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -17,7 +18,7 @@ export default async function Home({ params }: Props) {
 
   const t = await getTranslations("Dashboard");
   const now = new Date();
-  const [pendingTaskCount, upcomingExamCount, subjects, grades, upcomingTasks, upcomingExams, upcomingEvents] = await Promise.all([
+  const [pendingTaskCount, upcomingExamCount, subjects, grades, upcomingTasks, upcomingExams, upcomingEvents, totalExamCount] = await Promise.all([
     prisma.task.count({ where: { completed: false, subject: { userId: session.user.id } } }),
     prisma.exam.count({ where: { completed: false, examDate: { gte: now }, subject: { userId: session.user.id } } }),
     prisma.subject.findMany({
@@ -56,6 +57,7 @@ export default async function Home({ params }: Props) {
       take: 4,
       select: { id: true, title: true, startsAt: true, type: true, subject: { select: { name: true } } },
     }),
+    prisma.exam.count({ where: { subject: { userId: session.user.id } } }),
   ]);
 
   const totalGradeWeight = grades.reduce((sum, grade) => sum + grade.weight, 0);
@@ -73,6 +75,7 @@ export default async function Home({ params }: Props) {
     const subjectAverage = weight > 0 ? subjectGrades.reduce((sum, grade) => sum + (grade.score / grade.maxScore) * 10 * grade.weight, 0) / weight : null;
     return { ...subject, progress, subjectAverage };
   });
+  const needsOnboarding = subjects.length === 0 || (!subjects.some((subject) => subject.tasks.length > 0) && totalExamCount === 0);
 
   return (
     <div className={styles.page}>
@@ -81,6 +84,8 @@ export default async function Home({ params }: Props) {
         <h1>{t("greeting", { name: firstName })}</h1>
         <p>{t("subtitle")}</p>
       </header>
+
+      {needsOnboarding && <Onboarding initialSubjects={subjects.map(({ id, name }) => ({ id, name }))} />}
 
       <section className={styles.kpis} aria-label={t("summaryLabel")}>
         <article className={styles.kpi}><span className={`${styles.kpiIcon} ${styles.blue}`}>✓</span><div><strong>{pendingTaskCount}</strong><span>{t("pendingTasks")}</span><small>{t("pendingTasksHint")}</small></div></article>
