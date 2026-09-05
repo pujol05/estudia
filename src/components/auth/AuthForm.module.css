@@ -122,20 +122,33 @@
   font-size: 13px;
 }
 
-.privacyNotice {
+.consentField {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
   color: #667780;
   font-size: 12px;
   line-height: 1.5;
+  cursor: pointer;
 }
 
-.privacyNotice a {
+.consentField input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.consentField a {
   color: var(--color-primary);
   font-weight: 650;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.privacyNotice a:focus-visible {
+.consentField a:focus-visible {
   outline: 2px solid #57b9ff;
   outline-offset: 2px;
   border-radius: 2px;

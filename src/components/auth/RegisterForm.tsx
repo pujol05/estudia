@@ -25,6 +25,7 @@ export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileKey, setTurnstileKey] = useState(0);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const handleTurnstileToken = useCallback((token: string) => {
     setTurnstileToken(token);
@@ -60,6 +61,11 @@ export default function RegisterForm() {
 
     if (!turnstileToken) {
       setError(t("verificationRequired"));
+      return;
+    }
+
+    if (!agreedToTerms) {
+      setError(t("agreementRequired"));
       return;
     }
 
@@ -180,15 +186,24 @@ export default function RegisterForm() {
             </p>
           )}
 
-          <p className={styles.privacyNotice}>
-            {t("privacyBefore")} <Link href="/privacy">{t("privacyLink")}</Link>{" "}
-            {t("privacyAfter")}
-          </p>
+          <label className={styles.consentField}>
+            <input
+              type="checkbox"
+              checked={agreedToTerms}
+              onChange={(event) => setAgreedToTerms(event.target.checked)}
+              required
+            />
+            <span>
+              {t("agreeBefore")} <Link href="/privacy">{t("privacyLink")}</Link>{" "}
+              {t("agreeMiddle")} <Link href="/terms">{t("termsLink")}</Link>
+              {t("agreeEnd")}
+            </span>
+          </label>
 
           <button
             type="submit"
             className={styles.submit}
-            disabled={isLoading || !turnstileToken}
+            disabled={isLoading || !turnstileToken || !agreedToTerms}
           >
             {isLoading ? t("loading") : t("submit")}
           </button>

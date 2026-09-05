@@ -16,6 +16,7 @@ export default function Footer() {
             <ul className={styles.links}>
               <li><Link href="/contact">{t("contact")}</Link></li>
               <li><Link href="/privacy">{t("privacy")}</Link></li>
+              <li><Link href="/terms">{t("terms")}</Link></li>
             </ul>
           </nav>
         </div>
