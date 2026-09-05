@@ -26,6 +26,21 @@
   background-color: var(--color-primary);
 }
 
+.trigger:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .name {
+    display: none;
+  }
+
+  .menu {
+    max-width: calc(100vw - 40px);
+  }
+}
+
 .avatar {
   width: 32px;
   height: 32px;
@@ -78,7 +93,9 @@
 
 .menuAction,
 .logout {
+  box-sizing: border-box;
   width: 100%;
+  display: block;
 
   padding: 10px;
 
@@ -90,6 +107,7 @@
 
   font: inherit;
   text-align: left;
+  text-decoration: none;
 
   cursor: pointer;
 }

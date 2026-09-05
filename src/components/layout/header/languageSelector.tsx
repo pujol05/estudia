@@ -65,7 +65,7 @@ export default function LanguageSelector({ isOpen, onOpenChange }: Props) {
           aria-hidden="true"
         />
 
-        <span>{currentLanguage.code.toUpperCase()}</span>
+        <span className={styles.code}>{currentLanguage.code.toUpperCase()}</span>
 
         <span className={styles.arrow} aria-hidden="true">
           ▾

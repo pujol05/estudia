@@ -73,6 +73,7 @@
     "privateNavigation": "Navegació de l'aplicació",
     "login": "Iniciar sessió",
     "register": "Crear compte",
+    "account": "Compte",
     "profile": "El meu perfil",
     "logout": "Tancar sessió"
   },
@@ -402,6 +403,7 @@
     "subjectError": "L'assignatura seleccionada no és vàlida.",
     "saveError": "No s'ha pogut desar la tasca. Revisa les dades.",
     "deleteError": "No s'ha pogut eliminar la tasca.",
+    "cannotRevertToTodo": "No es pot tornar a «Per fer» una tasca amb temps d'estudi registrat.",
     "createSuccess": "Tasca creada correctament.",
     "updateSuccess": "Tasca actualitzada correctament.",
     "deleteSuccess": "Tasca eliminada correctament."

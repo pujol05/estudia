@@ -73,6 +73,7 @@
     "privateNavigation": "Navegación de la aplicación",
     "login": "Iniciar sesión",
     "register": "Crear cuenta",
+    "account": "Cuenta",
     "profile": "Mi perfil",
     "logout": "Cerrar sesión"
   },
@@ -402,6 +403,7 @@
     "subjectError": "La asignatura seleccionada no es válida.",
     "saveError": "No se ha podido guardar la tarea. Revisa los datos.",
     "deleteError": "No se ha podido eliminar la tarea.",
+    "cannotRevertToTodo": "No se puede volver a «Por hacer» una tarea con tiempo de estudio registrado.",
     "createSuccess": "Tarea creada correctamente.",
     "updateSuccess": "Tarea actualizada correctamente.",
     "deleteSuccess": "Tarea eliminada correctamente."

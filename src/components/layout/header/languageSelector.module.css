@@ -28,6 +28,11 @@
   background-color: var(--color-primary);
 }
 
+.trigger:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .flag {
   border-radius: 2px;
 }
@@ -85,4 +90,21 @@
 
 .option:hover {
   background-color: var(--color-light);
+}
+
+.option:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+@media (max-width: 560px) {
+  .code {
+    display: none;
+  }
+
+  .menu {
+    right: auto;
+    left: 0;
+    max-width: calc(100vw - 40px);
+  }
 }

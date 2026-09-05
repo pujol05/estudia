@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { saveStudySessionAction, type SaveStudySessionInput } from "@/app/[locale]/study/actions";
 import { useRouter } from "@/i18n/navigation";
-import { START_STUDY_EVENT } from "@/lib/study-timer-events";
+import { CLOSE_STUDY_PANEL_EVENT, START_STUDY_EVENT, STUDY_PANEL_OPENED_EVENT } from "@/lib/study-timer-events";
 
 import styles from "./StudyTimer.module.css";
 
@@ -168,6 +168,18 @@ export default function StudyTimer({ subjects }: { subjects: StudySubject[] }) {
     }, 500);
     return () => window.clearInterval(interval);
   }, [timer]);
+
+  useEffect(() => {
+    if (panelOpen) window.dispatchEvent(new CustomEvent(STUDY_PANEL_OPENED_EVENT));
+  }, [panelOpen]);
+
+  useEffect(() => {
+    function handleClosePanel() {
+      setPanelOpen(false);
+    }
+    window.addEventListener(CLOSE_STUDY_PANEL_EVENT, handleClosePanel);
+    return () => window.removeEventListener(CLOSE_STUDY_PANEL_EVENT, handleClosePanel);
+  }, []);
 
   useEffect(() => {
     function handleQuickStart(event: Event) {

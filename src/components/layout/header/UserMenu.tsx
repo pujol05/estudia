@@ -48,7 +48,7 @@ export default function UserMenu({
           ) : (initial)}
         </span>
 
-        <span>{name}</span>
+        <span className={styles.name}>{name}</span>
 
         <span className={styles.arrow}>▾</span>
       </button>

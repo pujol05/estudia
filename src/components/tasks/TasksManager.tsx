@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore, type FormEvent } from "react";
+import { useMemo, useState, useSyncExternalStore, type DragEvent, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 import {
@@ -66,6 +66,8 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
   const locale = useLocale();
   const router = useRouter();
   const [tasks, setTasks] = useState(initialTasks);
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const [dragOverStatus, setDragOverStatus] = useState<TaskStatus | null>(null);
   const [subjectFilter, setSubjectFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
@@ -249,6 +251,38 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
     setBusy(null);
   }
 
+  function handleCardDragStart(event: DragEvent<HTMLElement>, task: TaskSummary) {
+    setDraggedTaskId(task.id);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", task.id);
+  }
+
+  function handleCardDragEnd() {
+    setDraggedTaskId(null);
+    setDragOverStatus(null);
+  }
+
+  function handleColumnDragOver(event: DragEvent<HTMLDivElement>, status: TaskStatus) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    if (dragOverStatus !== status) setDragOverStatus(status);
+  }
+
+  function handleColumnDrop(event: DragEvent<HTMLDivElement>, status: TaskStatus) {
+    event.preventDefault();
+    const taskId = event.dataTransfer.getData("text/plain") || draggedTaskId;
+    setDraggedTaskId(null);
+    setDragOverStatus(null);
+    if (!taskId || busy !== null) return;
+    const task = tasks.find((item) => item.id === taskId);
+    if (!task || task.status === status) return;
+    if (status === "TODO" && task.timeEntries.length > 0) {
+      setFeedback({ type: "error", text: t("cannotRevertToTodo") });
+      return;
+    }
+    handleStatus(task, status);
+  }
+
   async function handleTimeLog(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!loggingTask) return;
@@ -319,12 +353,22 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
                 <span className={`${styles.statusDot} ${styles[`dot${columnStatus}`]}`} />
                 <h2>{statusLabel(columnStatus)}</h2><span>{counts[columnStatus]}</span>
               </header>
-              <div className={styles.cards}>
+              <div
+                className={`${styles.cards} ${dragOverStatus === columnStatus ? styles.dragOverColumn : ""}`}
+                onDragOver={(event) => handleColumnDragOver(event, columnStatus)}
+                onDrop={(event) => handleColumnDrop(event, columnStatus)}
+              >
                 {visibleTasks.filter((task) => task.status === columnStatus).map((task) => {
                   const totalMinutes = task.timeEntries.reduce((sum, entry) => sum + entry.minutes, 0);
                   const isExpanded = expandedTaskIds.has(task.id);
                   return (
-                    <article className={`${styles.taskCard} ${isExpanded ? styles.expandedCard : ""}`} key={task.id}>
+                    <article
+                      className={`${styles.taskCard} ${isExpanded ? styles.expandedCard : ""} ${draggedTaskId === task.id ? styles.dragging : ""}`}
+                      key={task.id}
+                      draggable
+                      onDragStart={(event) => handleCardDragStart(event, task)}
+                      onDragEnd={handleCardDragEnd}
+                    >
                       <div className={styles.compactRow}>
                         <button className={styles.compactMain} type="button" onClick={() => toggleTaskDetails(task.id)} aria-expanded={isExpanded} aria-controls={`task-details-${task.id}`}>
                           <span className={styles.compactIdentity}><strong className={task.status === "DONE" ? shared.completedTitle : ""}>{task.title}</strong><small>({task.subject.name})</small></span>

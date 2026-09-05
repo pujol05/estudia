@@ -300,20 +300,61 @@
 }
 
 @media (max-width: 720px) {
-  .timerTrigger > span:last-child {
+  .timerRoot {
+    position: absolute;
+  }
+
+  .timerTrigger {
+    position: fixed;
+    z-index: 250;
+    right: 18px;
+    bottom: 18px;
+    min-height: 56px;
+    padding: 0 20px;
+    background: var(--color-primary);
+    color: white;
+    border: 0;
+    border-radius: 999px;
+    box-shadow: 0 10px 30px rgb(3 30 43 / 35%);
+  }
+
+  .timerTrigger:hover,
+  .activeTrigger {
+    background: var(--color-primary);
+    color: white;
+    border: 0;
+  }
+
+  .activeTrigger .playIcon {
+    color: white;
+  }
+
+  .timerTrigger:not(.activeTrigger) {
+    width: 56px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .timerTrigger:not(.activeTrigger) > span:last-child {
     display: none;
   }
 
-  .activeTrigger > span:last-child {
-    display: inline;
+  .playIcon {
+    font-size: 15px;
   }
 
   .timerPanel {
     position: fixed;
-    top: 72px;
-    right: 12px;
-    left: 12px;
+    z-index: 320;
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: auto;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -14px 40px rgb(3 30 43 / 30%);
   }
 }
 

@@ -48,3 +48,8 @@ next-env.d.ts
 .claude/
 .windsurf/
 skills-lock.json
+
+# AI tooling docs
+AGENTS.md
+CLAUDE.md
+docs/

@@ -99,6 +99,79 @@
   color: var(--color-white) !important;
 }
 
+.authMenu {
+  position: relative;
+  display: none;
+}
+
+.authMenuTrigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 12px;
+
+  background-color: var(--color-primary);
+  color: var(--color-white);
+
+  border: 0;
+  border-radius: 7px;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.authMenuTrigger .arrow {
+  font-size: 11px;
+}
+
+.authMenuTrigger:focus-visible {
+  outline: 2px solid var(--color-white);
+  outline-offset: 2px;
+}
+
+.authMenuDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  min-width: 165px;
+  padding: 6px;
+
+  background-color: var(--color-white);
+
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+
+  box-shadow: 0 8px 24px rgb(0 0 0 / 15%);
+
+  z-index: 100;
+}
+
+.authMenuDropdown a {
+  padding: 10px;
+  color: var(--color-dark) !important;
+  border-radius: 5px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.authMenuDropdown a:hover {
+  background-color: var(--color-light);
+}
+
+.authMenuDropdown a:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
 @media (max-width: 1040px) {
   .container {
     flex-wrap: wrap;
@@ -136,5 +209,17 @@
 
   .navigation a {
     font-size: 14px;
+  }
+
+  .desktopOnly {
+    display: none;
+  }
+
+  .authMenu {
+    display: block;
+  }
+
+  .authMenuDropdown {
+    max-width: calc(100vw - 40px);
   }
 }
