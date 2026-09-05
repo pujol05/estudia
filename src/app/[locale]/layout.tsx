@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Figtree } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
@@ -58,6 +59,8 @@ export default async function RootLayout({
           </main>
           <Footer />
         </NextIntlClientProvider>
+
+        <Analytics />
       </body>
     </html>
   );
