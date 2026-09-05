@@ -17,8 +17,9 @@ model User {
   sessions Session[]
   accounts Account[]
 
-  subjects Subject[]
-  events   Event[]
+  subjects      Subject[]
+  events        Event[]
+  studySessions StudySession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -83,9 +84,10 @@ model Subject {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  tasks  Task[]
-  exams  Exam[]
-  events Event[]
+  tasks         Task[]
+  exams         Exam[]
+  events        Event[]
+  studySessions StudySession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -103,8 +105,8 @@ model Task {
   priority    String    @default("MEDIUM")
 
   subjectId   String
-  subject     Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  timeEntries TaskTimeEntry[]
+  subject     Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  timeEntries StudySession[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -113,18 +115,29 @@ model Task {
   @@index([subjectId, status])
 }
 
-model TaskTimeEntry {
-  id      String   @id @default(cuid())
-  date    DateTime @db.Date
-  minutes Int
+model StudySession {
+  id        String    @id @default(cuid())
+  date      DateTime  @db.Date
+  minutes   Int
+  mode      String    @default("MANUAL")
+  startedAt DateTime?
+  endedAt   DateTime?
 
-  taskId String
-  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  taskId String?
+  task   Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  subjectId String?
+  subject   Subject? @relation(fields: [subjectId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([userId, date])
   @@index([taskId, date])
+  @@index([subjectId, date])
 }
 
 model Exam {

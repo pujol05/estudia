@@ -16,7 +16,7 @@
 .compactRow { min-height: 56px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; }
 .compactMain { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto 16px; align-items: center; gap: 8px; padding: 10px 8px 10px 13px; background: transparent; color: var(--color-dark); border: 0; font: inherit; text-align: left; cursor: pointer; }
 .compactMain:hover { background: #f8fafa; }
-.compactMain:focus-visible, .quickLog:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
+.compactMain:focus-visible, .quickStudy:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
 .compactIdentity { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .compactIdentity strong, .compactIdentity small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .compactIdentity strong { font-size: 14px; }
@@ -24,9 +24,10 @@
 .compactHours { color: #5d7078; font-size: 11px; font-weight: 750; white-space: nowrap; }
 .chevron { color: #738188; font-size: 17px; line-height: 1; transform: rotate(0deg); transition: transform .16s ease; }
 .chevronOpen { transform: rotate(180deg); }
-.quickLog { margin: 8px 8px 8px 0; padding: 7px 9px; align-self: center; background: #e7f2f7; color: var(--color-primary); border: 0; border-radius: 7px; font: inherit; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; }
-.quickLog:hover { background: #dcecf4; }
-.quickLog:disabled { opacity: .5; cursor: not-allowed; }
+.quickStudy { display: inline-flex; align-items: center; gap: 5px; margin: 8px 8px 8px 0; padding: 7px 9px; align-self: center; background: #eaf7ef; color: #2d784e; border: 0; border-radius: 7px; font: inherit; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.quickStudy span { font-size: 8px; }
+.quickStudy:hover { background: #dff1e6; }
+.quickStudy:disabled { opacity: .5; cursor: not-allowed; }
 .cardDetails { padding: 13px 14px 14px; border-top: 1px solid #e8edee; }
 .cardDetails > p { display: -webkit-box; overflow: hidden; margin-top: 10px; color: #66757c; font-size: 13px; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 .cardTop { display: flex; justify-content: space-between; gap: 8px; align-items: center; }

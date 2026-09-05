@@ -6,11 +6,20 @@ export type SubjectOption = {
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE";
 
-export type TaskTimeEntrySummary = {
+export type StudySessionMode = "MANUAL" | "STOPWATCH" | "POMODORO";
+
+export type StudySessionSummary = {
   id: string;
   date: string;
   minutes: number;
+  mode: StudySessionMode;
+  startedAt: string | null;
+  endedAt: string | null;
+  task: { id: string; title: string } | null;
+  subject: SubjectOption | null;
 };
+
+export type TaskTimeEntrySummary = Pick<StudySessionSummary, "id" | "date" | "minutes" | "mode">;
 
 export type TaskSummary = {
   id: string;

@@ -9,7 +9,7 @@ import {
   subjectBelongsToUser,
   type AcademicActionError,
 } from "@/lib/academic";
-import type { TaskPriority, TaskStatus, TaskSummary } from "@/lib/academic-types";
+import type { StudySessionMode, TaskPriority, TaskStatus, TaskSummary } from "@/lib/academic-types";
 import prisma from "@/lib/prisma";
 
 const PRIORITIES: TaskPriority[] = ["LOW", "MEDIUM", "HIGH"];
@@ -43,7 +43,7 @@ const taskSelect = {
   subject: { select: { id: true, name: true } },
   timeEntries: {
     orderBy: [{ date: "desc" as const }, { createdAt: "desc" as const }],
-    select: { id: true, date: true, minutes: true },
+    select: { id: true, date: true, minutes: true, mode: true },
   },
 };
 
@@ -56,7 +56,7 @@ function serializeTask(task: {
   status: string;
   priority: string;
   subject: { id: string; name: string };
-  timeEntries: { id: string; date: Date; minutes: number }[];
+  timeEntries: { id: string; date: Date; minutes: number; mode: string }[];
 }): TaskSummary {
   return {
     ...task,
@@ -66,6 +66,7 @@ function serializeTask(task: {
     timeEntries: task.timeEntries.map((entry) => ({
       ...entry,
       date: entry.date.toISOString().slice(0, 10),
+      mode: entry.mode as StudySessionMode,
     })),
   };
 }
@@ -178,13 +179,13 @@ export async function addTaskTimeEntryAction(
 
   const ownedTask = await prisma.task.findFirst({
     where: { id: taskId, subject: { userId } },
-    select: { id: true, status: true },
+    select: { id: true, status: true, subjectId: true },
   });
   if (!ownedTask) return { ok: false, error: "notFound" };
 
   try {
     await prisma.$transaction([
-      prisma.taskTimeEntry.create({ data: { taskId, date, minutes } }),
+      prisma.studySession.create({ data: { taskId, subjectId: ownedTask.subjectId, userId, date, minutes, mode: "MANUAL" } }),
       ...(ownedTask.status === "TODO"
         ? [prisma.task.update({ where: { id: taskId }, data: { status: "IN_PROGRESS", completed: false } })]
         : []),

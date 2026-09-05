@@ -12,12 +12,13 @@ import {
   type TaskInput,
 } from "@/app/[locale]/tasks/actions";
 import { useRouter } from "@/i18n/navigation";
-import type { SubjectOption, TaskPriority, TaskStatus, TaskSummary } from "@/lib/academic-types";
+import type { StudySessionSummary, SubjectOption, TaskPriority, TaskStatus, TaskSummary } from "@/lib/academic-types";
+import { START_STUDY_EVENT } from "@/lib/study-timer-events";
 
 import shared from "@/components/academic/AcademicManager.module.css";
 import styles from "@/components/tasks/TasksManager.module.css";
 
-type Props = { initialSubjects: SubjectOption[]; initialTasks: TaskSummary[] };
+type Props = { initialSubjects: SubjectOption[]; initialTasks: TaskSummary[]; initialStudySessions: StudySessionSummary[] };
 type Feedback = { type: "error" | "success"; text: string } | null;
 type PeriodMode = "day" | "week";
 
@@ -59,7 +60,7 @@ function getWeekRange(value: string) {
   return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
 }
 
-export default function TasksManager({ initialSubjects, initialTasks }: Props) {
+export default function TasksManager({ initialSubjects, initialTasks, initialStudySessions }: Props) {
   const t = useTranslations("Tasks");
   const common = useTranslations("Academic");
   const locale = useLocale();
@@ -128,15 +129,27 @@ export default function TasksManager({ initialSubjects, initialTasks }: Props) {
     .filter((row) => row.minutes > 0)
     .sort((a, b) => b.minutes - a.minutes), [periodRange, visibleTasks]);
 
+  const periodSessions = useMemo(() => {
+    const normalizedQuery = query.trim().toLocaleLowerCase(locale);
+    return initialStudySessions.filter((session) => {
+      const matchesPeriod = session.date >= periodRange.start && session.date <= periodRange.end;
+      const matchesSubject = subjectFilter === "all" || session.subject?.id === subjectFilter;
+      const matchesQuery = !normalizedQuery || `${session.task?.title ?? ""} ${session.subject?.name ?? ""}`.toLocaleLowerCase(locale).includes(normalizedQuery);
+      return matchesPeriod && matchesSubject && matchesQuery;
+    });
+  }, [initialStudySessions, locale, periodRange, query, subjectFilter]);
+
   const subjectRows = useMemo(() => {
-    const totals = new Map<string, { id: string; name: string; minutes: number }>();
-    taskRows.forEach(({ task, minutes }) => {
-      const current = totals.get(task.subject.id) ?? { ...task.subject, minutes: 0 };
-      current.minutes += minutes;
-      totals.set(task.subject.id, current);
+    const totals = new Map<string, { id: string; name: string; minutes: number; sessions: number }>();
+    periodSessions.forEach((session) => {
+      const key = session.subject?.id ?? "general";
+      const current = totals.get(key) ?? { id: key, name: session.subject?.name ?? t("generalStudy"), minutes: 0, sessions: 0 };
+      current.minutes += session.minutes;
+      current.sessions += 1;
+      totals.set(key, current);
     });
     return [...totals.values()].sort((a, b) => b.minutes - a.minutes);
-  }, [taskRows]);
+  }, [periodSessions, t]);
 
   const counts = useMemo(() => Object.fromEntries(STATUSES.map((status) => [status, visibleTasks.filter((task) => task.status === status).length])) as Record<TaskStatus, number>, [visibleTasks]);
   const totalTasks = visibleTasks.length;
@@ -196,6 +209,10 @@ export default function TasksManager({ initialSubjects, initialTasks }: Props) {
     setFeedback(null);
   }
 
+  function startStudy(taskId: string) {
+    window.dispatchEvent(new CustomEvent(START_STUDY_EVENT, { detail: { taskId } }));
+  }
+
   function toggleTaskDetails(taskId: string) {
     setExpandedTaskIds((current) => {
       const next = new Set(current);
@@ -217,6 +234,7 @@ export default function TasksManager({ initialSubjects, initialTasks }: Props) {
       setTasks((current) => editingId ? current.map((task) => task.id === result.task.id ? result.task : task) : [result.task, ...current]);
       setIsEditorOpen(false);
       setFeedback({ type: "success", text: editingId ? t("updateSuccess") : t("createSuccess") });
+      router.refresh();
     }
     setBusy(null);
   }
@@ -313,14 +331,14 @@ export default function TasksManager({ initialSubjects, initialTasks }: Props) {
                           <span className={styles.compactHours}>{formatMinutes(totalMinutes)}</span>
                           <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ""}`} aria-hidden="true">⌄</span>
                         </button>
-                        <button className={styles.quickLog} type="button" onClick={() => openTimeLog(task)} disabled={busy !== null}>{t("addHoursShort")}</button>
+                        <button className={styles.quickStudy} type="button" onClick={() => startStudy(task.id)} disabled={busy !== null}><span aria-hidden="true">▶</span>{t("study")}</button>
                       </div>
                       {isExpanded && <div className={styles.cardDetails} id={`task-details-${task.id}`}>
                         <div className={styles.cardTop}><span className={`${shared.badge} ${task.priority === "HIGH" ? shared.badgeHigh : task.priority === "LOW" ? shared.badgeLow : shared.badgeMedium}`}>{priorityLabel(task.priority)}</span><strong className={styles.hoursBadge}>{formatMinutes(totalMinutes)}</strong></div>
                         {task.description && <p>{task.description}</p>}
                         <div className={styles.cardMeta}><strong>{task.subject.name}</strong><span>{task.dueDate ? dateFormatter.format(new Date(task.dueDate)) : t("noDate")}</span></div>
                         <label className={styles.statusControl}><span>{t("statusLabel")}</span><select value={task.status} onChange={(event) => handleStatus(task, event.target.value as TaskStatus)} disabled={busy !== null}>{STATUSES.map((value) => <option value={value} key={value}>{statusLabel(value)}</option>)}</select></label>
-                        <div className={styles.cardActions}><button type="button" onClick={() => openEdit(task)} disabled={busy !== null}>{common("edit")}</button><button className={styles.deleteLink} type="button" onClick={() => setDeletingTask(task)} disabled={busy !== null}>{common("delete")}</button></div>
+                        <div className={styles.cardActions}><button type="button" onClick={() => openTimeLog(task)} disabled={busy !== null}>{t("logTime")}</button><button type="button" onClick={() => openEdit(task)} disabled={busy !== null}>{common("edit")}</button><button className={styles.deleteLink} type="button" onClick={() => setDeletingTask(task)} disabled={busy !== null}>{common("delete")}</button></div>
                       </div>}
                     </article>
                   );
@@ -349,7 +367,7 @@ export default function TasksManager({ initialSubjects, initialTasks }: Props) {
             </article>
             <article className={`${styles.hoursPanel} ${styles.subjectHours}`}>
               <div className={styles.panelTitle}><div><h3>{t("hoursBySubject")}</h3><span>{t(periodMode === "day" ? "groupedHintDay" : "groupedHintWeek")}</span></div></div>
-              {subjectRows.length === 0 ? <p className={styles.noHours}>{t(periodMode === "day" ? "noHoursDay" : "noHoursWeek")}</p> : <div className={styles.tableWrap}><table><thead><tr><th>{common("subject")}</th><th>{t("tasksWorked")}</th><th>{t("hoursColumn")}</th></tr></thead><tbody>{subjectRows.map((subject) => <tr key={subject.id}><td>{subject.name}</td><td>{taskRows.filter((row) => row.task.subject.id === subject.id).length}</td><td>{formatMinutes(subject.minutes)}</td></tr>)}</tbody></table></div>}
+              {subjectRows.length === 0 ? <p className={styles.noHours}>{t(periodMode === "day" ? "noHoursDay" : "noHoursWeek")}</p> : <div className={styles.tableWrap}><table><thead><tr><th>{common("subject")}</th><th>{t("sessionsColumn")}</th><th>{t("hoursColumn")}</th></tr></thead><tbody>{subjectRows.map((subject) => <tr key={subject.id}><td>{subject.name}</td><td>{subject.sessions}</td><td>{formatMinutes(subject.minutes)}</td></tr>)}</tbody></table></div>}
             </article>
           </div>
         </section>
