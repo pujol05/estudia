@@ -5,14 +5,13 @@ import { useLocale, useTranslations } from "next-intl";
 
 import TurnstileWidget from "@/components/security/TurnstileWidget";
 import { authClient } from "@/lib/auth-client";
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 
 import styles from "./AuthForm.module.css";
 
 export default function RegisterForm() {
   const t = useTranslations("Auth.register");
   const locale = useLocale();
-  const router = useRouter();
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
   //quan luser escriu canvia de "" a name amb setName("input")
@@ -26,6 +25,12 @@ export default function RegisterForm() {
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileKey, setTurnstileKey] = useState(0);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // Set once the account exists. Sign-up never returns a session while
+  // requireEmailVerification is on, so the form stays on this screen instead
+  // of redirecting to a page the user is still logged out of.
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   const handleTurnstileToken = useCallback((token: string) => {
     setTurnstileToken(token);
@@ -42,6 +47,10 @@ export default function RegisterForm() {
   function resetTurnstile() {
     setTurnstileToken("");
     setTurnstileKey((currentKey) => currentKey + 1);
+  }
+
+  function verificationCallbackURL() {
+    return `${window.location.origin}/${locale}/verify-email`;
   }
 
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
@@ -75,6 +84,7 @@ export default function RegisterForm() {
       name,
       email,
       password,
+      callbackURL: verificationCallbackURL(),
       fetchOptions: {
         headers: {
           "x-turnstile-token": turnstileToken,
@@ -89,8 +99,86 @@ export default function RegisterForm() {
       return;
     }
 
-    router.push("/");
-    router.refresh();
+    setPendingEmail(email);
+    setPassword("");
+    setConfirmPassword("");
+    resetTurnstile();
+    setIsLoading(false);
+  }
+
+  async function handleResend() {
+    if (!turnstileToken) {
+      setError(t("verificationRequired"));
+      return;
+    }
+
+    setError("");
+    setResendStatus("sending");
+
+    const { error } = await authClient.sendVerificationEmail({
+      email: pendingEmail,
+      callbackURL: verificationCallbackURL(),
+      fetchOptions: {
+        headers: {
+          "x-turnstile-token": turnstileToken,
+        },
+      },
+    });
+
+    resetTurnstile();
+    setResendStatus(error ? "error" : "sent");
+  }
+
+  if (pendingEmail) {
+    return (
+      <section className={styles.auth}>
+        <div className={styles.card}>
+          <h1>{t("checkEmailTitle")}</h1>
+
+          <p className={styles.subtitle}>
+            {t("checkEmailText", { email: pendingEmail })}
+          </p>
+
+          <div className={styles.result}>
+            {siteKey ? (
+              <TurnstileWidget
+                key={turnstileKey}
+                siteKey={siteKey}
+                locale={locale}
+                action="email-verification-request"
+                onTokenChange={handleTurnstileToken}
+                onError={handleTurnstileError}
+              />
+            ) : (
+              <p className={styles.error}>{t("verificationUnavailable")}</p>
+            )}
+
+            {resendStatus === "sent" && (
+              <p className={styles.success} role="status">{t("resendSuccess")}</p>
+            )}
+
+            {resendStatus === "error" && (
+              <p className={styles.error} role="alert">{t("resendError")}</p>
+            )}
+
+            {error && <p className={styles.error} role="alert">{error}</p>}
+
+            <button
+              type="button"
+              className={styles.submit}
+              onClick={handleResend}
+              disabled={resendStatus === "sending" || !turnstileToken}
+            >
+              {resendStatus === "sending" ? t("resending") : t("resend")}
+            </button>
+          </div>
+
+          <p className={styles.switch}>
+            <Link href="/login">{t("login")}</Link>
+          </p>
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -129,6 +217,7 @@ export default function RegisterForm() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
+              maxLength={254}
               autoComplete="email"
             />
           </div>

@@ -1,7 +1,5 @@
 import "server-only";
 
-import { after } from "next/server";
-
 import { getRequestLocale, type Locale } from "@/lib/email-locale";
 import { sendEmail } from "@/lib/email";
 
@@ -23,7 +21,11 @@ const copy: Record<Locale, { subject: string; introduction: string; expiry: stri
   },
 };
 
-export function queueVerificationEmail({
+// Sent inline rather than through `after()`: better-auth already decides
+// whether to await or background this, and awaiting it is what lets the
+// resend endpoint report a delivery failure instead of silently claiming
+// the message was sent.
+export async function sendVerificationEmail({
   email,
   url,
   request,
@@ -37,26 +39,24 @@ export function queueVerificationEmail({
   const message = copy[locale];
 
   if (!from) {
-    console.error("AUTH_FROM_EMAIL or CONTACT_FROM_EMAIL is not configured");
-    return;
+    throw new Error("AUTH_FROM_EMAIL or CONTACT_FROM_EMAIL is not configured");
   }
 
-  after(async () => {
-    try {
-      await sendEmail({
-        from,
-        to: email,
-        subject: message.subject,
-        text: [
-          message.introduction,
-          "",
-          url,
-          "",
-          message.expiry,
-        ].join("\n"),
-      });
-    } catch (error) {
-      console.error("Verification email could not be sent", error);
-    }
-  });
+  try {
+    await sendEmail({
+      from,
+      to: email,
+      subject: message.subject,
+      text: [
+        message.introduction,
+        "",
+        url,
+        "",
+        message.expiry,
+      ].join("\n"),
+    });
+  } catch (error) {
+    console.error("Verification email could not be sent", { from, error });
+    throw error;
+  }
 }

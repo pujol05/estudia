@@ -614,7 +614,13 @@
       "agreeEnd": ".",
       "agreementRequired": "You must confirm your age and accept the privacy information and terms of use.",
       "alreadyAccount": "Already have an account?",
-      "login": "Sign in"
+      "login": "Sign in",
+      "checkEmailTitle": "Check your email",
+      "checkEmailText": "We sent a verification link to {email}. Open it to activate your account and sign in. Check your spam folder too.",
+      "resend": "Send the link again",
+      "resending": "Sending...",
+      "resendSuccess": "Link sent again. It can take a couple of minutes to arrive.",
+      "resendError": "The link could not be sent. Try again in a few minutes."
     },
     "forgotPassword": {
       "title": "Recover password",
@@ -644,6 +650,15 @@
       "requestAgain": "Request another link",
       "success": "Your password has been updated. You can now sign in.",
       "login": "Sign in"
+    },
+    "verifyEmail": {
+      "successTitle": "Email verified",
+      "successText": "Your account is active and you are signed in.",
+      "goToApp": "Go to Estudia",
+      "errorTitle": "We could not verify your email",
+      "expiredText": "This link has expired. Sign in and we will send you a new one.",
+      "invalidText": "This link is not valid or has already been used. Sign in and we will send you a new one.",
+      "backToLogin": "Sign in"
     }
   }
 }

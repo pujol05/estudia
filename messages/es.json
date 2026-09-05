@@ -614,7 +614,13 @@
       "agreeEnd": ".",
       "agreementRequired": "Debes confirmar la edad y aceptar la información de privacidad y las condiciones de uso.",
       "alreadyAccount": "¿Ya tienes cuenta?",
-      "login": "Iniciar sesión"
+      "login": "Iniciar sesión",
+      "checkEmailTitle": "Revisa tu correo",
+      "checkEmailText": "Hemos enviado un enlace de verificación a {email}. Ábrelo para activar la cuenta y entrar. Revisa también la carpeta de spam.",
+      "resend": "Volver a enviar el enlace",
+      "resending": "Enviando...",
+      "resendSuccess": "Enlace enviado de nuevo. Puede tardar un par de minutos en llegar.",
+      "resendError": "No se ha podido enviar el enlace. Inténtalo de nuevo dentro de unos minutos."
     },
     "forgotPassword": {
       "title": "Recuperar contraseña",
@@ -644,6 +650,15 @@
       "requestAgain": "Solicitar otro enlace",
       "success": "La contraseña se ha actualizado correctamente. Ya puedes iniciar sesión.",
       "login": "Iniciar sesión"
+    },
+    "verifyEmail": {
+      "successTitle": "Correo verificado",
+      "successText": "Tu cuenta ya está activa y has iniciado sesión.",
+      "goToApp": "Ir a Estudia",
+      "errorTitle": "No hemos podido verificar el correo",
+      "expiredText": "Este enlace ha caducado. Inicia sesión y te enviaremos uno nuevo.",
+      "invalidText": "Este enlace no es válido o ya se ha utilizado. Inicia sesión y te enviaremos uno nuevo.",
+      "backToLogin": "Iniciar sesión"
     }
   }
 }

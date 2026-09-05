@@ -614,7 +614,13 @@
       "agreeEnd": ".",
       "agreementRequired": "Cal confirmar l'edat i acceptar la informació de privacitat i les condicions d'ús.",
       "alreadyAccount": "Ja tens compte?",
-      "login": "Iniciar sessió"
+      "login": "Iniciar sessió",
+      "checkEmailTitle": "Revisa el teu correu",
+      "checkEmailText": "Hem enviat un enllaç de verificació a {email}. Obre'l per activar el compte i entrar. Revisa també la carpeta de correu brossa.",
+      "resend": "Tornar a enviar l'enllaç",
+      "resending": "Enviant...",
+      "resendSuccess": "Enllaç enviat de nou. Pot trigar un parell de minuts a arribar.",
+      "resendError": "No s'ha pogut enviar l'enllaç. Torna-ho a provar d'aquí a uns minuts."
     },
     "forgotPassword": {
       "title": "Recuperar contrasenya",
@@ -644,6 +650,15 @@
       "requestAgain": "Demanar un altre enllaç",
       "success": "La contrasenya s’ha actualitzat correctament. Ja pots iniciar sessió.",
       "login": "Iniciar sessió"
+    },
+    "verifyEmail": {
+      "successTitle": "Correu verificat",
+      "successText": "El teu compte ja està actiu i has iniciat sessió.",
+      "goToApp": "Anar a Estudia",
+      "errorTitle": "No hem pogut verificar el correu",
+      "expiredText": "Aquest enllaç ha caducat. Inicia sessió i te n'enviarem un de nou.",
+      "invalidText": "Aquest enllaç no és vàlid o ja s'ha utilitzat. Inicia sessió i te n'enviarem un de nou.",
+      "backToLogin": "Iniciar sessió"
     }
   }
 }

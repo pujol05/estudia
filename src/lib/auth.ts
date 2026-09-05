@@ -6,9 +6,19 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 
 import prisma from "@/lib/prisma";
-import { queuePasswordResetEmail } from "@/lib/password-reset-email";
-import { queueVerificationEmail } from "@/lib/verification-email";
+import { sendPasswordResetEmail } from "@/lib/password-reset-email";
+import { sendVerificationEmail } from "@/lib/verification-email";
 import { type TurnstileAction, verifyTurnstileToken } from "@/lib/turnstile";
+
+// better-auth trusts BETTER_AUTH_URL on its own. Anything else the app is
+// reachable through (a custom domain alongside the *.vercel.app one) has to be
+// listed here, or the verification and reset links fail their origin check.
+const trustedOrigins = Array.from(new Set(
+  (process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "")
+    .split(",")
+    .map((origin) => origin.trim().replace(/\/$/, ""))
+    .filter(Boolean),
+));
 
 const turnstileActions: Partial<Record<string, TurnstileAction>> = {
   "/sign-up/email": "register",
@@ -21,14 +31,15 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
 
+  trustedOrigins,
+
   emailAndPassword: {
     enabled: true,
-    // TODO: re-enable once verification email delivery is confirmed working in production.
-    requireEmailVerification: false,
+    requireEmailVerification: true,
     revokeSessionsOnPasswordReset: true,
     resetPasswordTokenExpiresIn: 3600,
     sendResetPassword: async ({ user, url }, request) => {
-      queuePasswordResetEmail({
+      await sendPasswordResetEmail({
         email: user.email,
         url,
         request,
@@ -40,8 +51,9 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendOnSignIn: true,
     autoSignInAfterVerification: true,
+    expiresIn: 3600,
     sendVerificationEmail: async ({ user, url }, request) => {
-      queueVerificationEmail({
+      await sendVerificationEmail({
         email: user.email,
         url,
         request,

@@ -1,7 +1,5 @@
 import "server-only";
 
-import { after } from "next/server";
-
 import { getRequestLocale, type Locale } from "@/lib/email-locale";
 import { sendEmail } from "@/lib/email";
 
@@ -23,7 +21,7 @@ const copy: Record<Locale, { subject: string; introduction: string; expiry: stri
   },
 };
 
-export function queuePasswordResetEmail({
+export async function sendPasswordResetEmail({
   email,
   url,
   request,
@@ -37,26 +35,24 @@ export function queuePasswordResetEmail({
   const message = copy[locale];
 
   if (!from) {
-    console.error("AUTH_FROM_EMAIL or CONTACT_FROM_EMAIL is not configured");
-    return;
+    throw new Error("AUTH_FROM_EMAIL or CONTACT_FROM_EMAIL is not configured");
   }
 
-  after(async () => {
-    try {
-      await sendEmail({
-        from,
-        to: email,
-        subject: message.subject,
-        text: [
-          message.introduction,
-          "",
-          url,
-          "",
-          message.expiry,
-        ].join("\n"),
-      });
-    } catch (error) {
-      console.error("Password reset email could not be sent", error);
-    }
-  });
+  try {
+    await sendEmail({
+      from,
+      to: email,
+      subject: message.subject,
+      text: [
+        message.introduction,
+        "",
+        url,
+        "",
+        message.expiry,
+      ].join("\n"),
+    });
+  } catch (error) {
+    console.error("Password reset email could not be sent", { from, error });
+    throw error;
+  }
 }

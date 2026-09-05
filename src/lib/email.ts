@@ -36,7 +36,14 @@ export async function sendEmail({
     }),
   });
 
+  // Resend explains refusals in the body (unverified domain, sandbox mode,
+  // suppressed recipient...). Without it the logs only show a status code,
+  // which is not enough to tell a configuration problem from an outage.
+  const payload = await response.text().catch(() => "");
+
   if (!response.ok) {
-    throw new Error(`Resend returned ${response.status}`);
+    throw new Error(`Resend returned ${response.status}: ${payload.slice(0, 500)}`);
   }
+
+  return payload.slice(0, 200);
 }
