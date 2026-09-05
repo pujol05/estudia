@@ -29,7 +29,7 @@ export default function LoginForm() {
     });
 
     if (error) {
-      setError(t("invalidCredentials"));
+      setError(error.code === "EMAIL_NOT_VERIFIED" ? t("emailNotVerified") : t("invalidCredentials"));
       setIsLoading(false);
       return;
     }

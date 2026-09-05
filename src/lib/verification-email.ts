@@ -7,23 +7,23 @@ import { sendEmail } from "@/lib/email";
 
 const copy: Record<Locale, { subject: string; introduction: string; expiry: string }> = {
   ca: {
-    subject: "Restableix la contrasenya d’Estudia",
-    introduction: "Hem rebut una sol·licitud per restablir la contrasenya del teu compte d’Estudia.",
-    expiry: "L’enllaç caduca d’aquí a una hora. Si no ho has demanat, pots ignorar aquest missatge.",
+    subject: "Verifica el teu correu a Estudia",
+    introduction: "Gràcies per crear un compte a Estudia. Verifica el teu correu per activar-lo del tot.",
+    expiry: "L’enllaç caduca d’aquí a una hora. Si no has creat aquest compte, pots ignorar aquest missatge.",
   },
   es: {
-    subject: "Restablece la contraseña de Estudia",
-    introduction: "Hemos recibido una solicitud para restablecer la contraseña de tu cuenta de Estudia.",
-    expiry: "El enlace caduca dentro de una hora. Si no lo has solicitado, puedes ignorar este mensaje.",
+    subject: "Verifica tu correo en Estudia",
+    introduction: "Gracias por crear una cuenta en Estudia. Verifica tu correo para activarla del todo.",
+    expiry: "El enlace caduca dentro de una hora. Si no has creado esta cuenta, puedes ignorar este mensaje.",
   },
   en: {
-    subject: "Reset your Estudia password",
-    introduction: "We received a request to reset the password for your Estudia account.",
-    expiry: "The link expires in one hour. If you did not request it, you can ignore this message.",
+    subject: "Verify your email for Estudia",
+    introduction: "Thanks for creating an Estudia account. Verify your email to finish activating it.",
+    expiry: "The link expires in one hour. If you did not create this account, you can ignore this message.",
   },
 };
 
-export function queuePasswordResetEmail({
+export function queueVerificationEmail({
   email,
   url,
   request,
@@ -56,7 +56,7 @@ export function queuePasswordResetEmail({
         ].join("\n"),
       });
     } catch (error) {
-      console.error("Password reset email could not be sent", error);
+      console.error("Verification email could not be sent", error);
     }
   });
 }

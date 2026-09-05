@@ -548,6 +548,7 @@
       "submit": "Iniciar sessió",
       "loading": "Iniciant sessió...",
       "invalidCredentials": "El correu o la contrasenya no són correctes.",
+      "emailNotVerified": "Encara no has verificat el correu. T'hem enviat un enllaç nou; revisa la safata d'entrada.",
       "forgotPassword": "Has oblidat la contrasenya?",
       "noAccount": "Encara no tens compte?",
       "register": "Crear compte"

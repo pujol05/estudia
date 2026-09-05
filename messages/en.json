@@ -548,6 +548,7 @@
       "submit": "Sign in",
       "loading": "Signing in...",
       "invalidCredentials": "The email or password is incorrect.",
+      "emailNotVerified": "You haven't verified your email yet. We've sent you a new link — check your inbox.",
       "forgotPassword": "Forgot your password?",
       "noAccount": "Don't have an account yet?",
       "register": "Create account"

@@ -3,7 +3,8 @@ import "server-only";
 export type TurnstileAction =
   | "contact"
   | "register"
-  | "password-reset-request";
+  | "password-reset-request"
+  | "email-verification-request";
 
 type TurnstileVerification = {
   success?: boolean;

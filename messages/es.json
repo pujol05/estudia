@@ -548,6 +548,7 @@
       "submit": "Iniciar sesión",
       "loading": "Iniciando sesión...",
       "invalidCredentials": "El correo o la contraseña no son correctos.",
+      "emailNotVerified": "Todavía no has verificado el correo. Te hemos enviado un enlace nuevo; revisa tu bandeja de entrada.",
       "forgotPassword": "¿Has olvidado la contraseña?",
       "noAccount": "¿Todavía no tienes cuenta?",
       "register": "Crear cuenta"

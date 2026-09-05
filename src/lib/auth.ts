@@ -7,11 +7,13 @@ import { nextCookies } from "better-auth/next-js";
 
 import prisma from "@/lib/prisma";
 import { queuePasswordResetEmail } from "@/lib/password-reset-email";
+import { queueVerificationEmail } from "@/lib/verification-email";
 import { type TurnstileAction, verifyTurnstileToken } from "@/lib/turnstile";
 
 const turnstileActions: Partial<Record<string, TurnstileAction>> = {
   "/sign-up/email": "register",
   "/request-password-reset": "password-reset-request",
+  "/send-verification-email": "email-verification-request",
 };
 
 export const auth = betterAuth({
@@ -21,10 +23,24 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: true,
     revokeSessionsOnPasswordReset: true,
     resetPasswordTokenExpiresIn: 3600,
     sendResetPassword: async ({ user, url }, request) => {
       queuePasswordResetEmail({
+        email: user.email,
+        url,
+        request,
+      });
+    },
+  },
+
+  emailVerification: {
+    sendOnSignUp: true,
+    sendOnSignIn: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }, request) => {
+      queueVerificationEmail({
         email: user.email,
         url,
         request,
