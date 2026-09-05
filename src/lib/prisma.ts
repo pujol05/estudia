@@ -21,8 +21,12 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 //connecta amb la BD de postgreSQL amb l'adaptador PrismaPg i la url de la BD que es troba a .env
+// max: 1 perquè en serverless cada instància (cold start) obre el seu propi grup de
+// connexions; sense límit, pg.Pool en permet fins a 10 per instància i es poden
+// exhaurir les connexions disponibles de la base de dades sota càrrega.
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
+  max: 1,
 });
 
 // Create a singleton PrismaClient instance to prevent exhausting database connections in development

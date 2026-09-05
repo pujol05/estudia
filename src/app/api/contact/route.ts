@@ -1,18 +1,12 @@
 import { NextRequest } from "next/server";
 
 import { sendEmail } from "@/lib/email";
+import { consumeRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstileToken } from "@/lib/turnstile";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_WINDOW_SECONDS = 10 * 60;
 const RATE_LIMIT_MAX_REQUESTS = 5;
-
-type RateLimitEntry = {
-  count: number;
-  resetAt: number;
-};
-
-const rateLimitStore = new Map<string, RateLimitEntry>();
 
 function isSameOrigin(request: NextRequest) {
   const origin = request.headers.get("origin");
@@ -29,7 +23,7 @@ function isSameOrigin(request: NextRequest) {
   }
 }
 
-function isRateLimited(request: NextRequest) {
+async function isRateLimited(request: NextRequest) {
   const forwardedFor = request.headers.get("x-forwarded-for");
   const clientIp = forwardedFor?.split(",")[0]?.trim() ?? request.headers.get("x-real-ip");
 
@@ -37,19 +31,13 @@ function isRateLimited(request: NextRequest) {
     return false;
   }
 
-  const now = Date.now();
-  const entry = rateLimitStore.get(clientIp);
+  const allowed = await consumeRateLimit({
+    key: `contact:${clientIp}`,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+    max: RATE_LIMIT_MAX_REQUESTS,
+  });
 
-  if (!entry || entry.resetAt <= now) {
-    rateLimitStore.set(clientIp, {
-      count: 1,
-      resetAt: now + RATE_LIMIT_WINDOW_MS,
-    });
-    return false;
-  }
-
-  entry.count += 1;
-  return entry.count > RATE_LIMIT_MAX_REQUESTS;
+  return !allowed;
 }
 
 function cleanHeaderValue(value: string) {
@@ -115,7 +103,7 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "verification_failed" }, { status: 400 });
   }
 
-  if (isRateLimited(request)) {
+  if (await isRateLimited(request)) {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }
 

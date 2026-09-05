@@ -2,6 +2,14 @@
   "HomePage": {
     "title": "Resum"
   },
+  "ErrorPages": {
+    "title": "Alguna cosa ha fallat",
+    "text": "Hi ha hagut un error inesperat. Torna-ho a provar o torna a l'inici.",
+    "retry": "Torna-ho a provar",
+    "backHome": "Tornar a l'inici",
+    "notFoundTitle": "Pàgina no trobada",
+    "notFoundText": "La pàgina que busques no existeix o s'ha mogut."
+  },
   "Landing": {
     "eyebrow": "Tot el teu curs, en un sol lloc",
     "titleStart": "Menys caos. Més temps per",

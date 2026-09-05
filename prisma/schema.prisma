@@ -77,6 +77,13 @@ model Verification {
   @@index([identifier])
 }
 
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
 model Subject {
   id   String @id @default(cuid())
   name String

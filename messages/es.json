@@ -2,6 +2,14 @@
   "HomePage": {
     "title": "Resumen"
   },
+  "ErrorPages": {
+    "title": "Algo ha fallado",
+    "text": "Ha ocurrido un error inesperado. Vuelve a intentarlo o vuelve al inicio.",
+    "retry": "Volver a intentarlo",
+    "backHome": "Volver al inicio",
+    "notFoundTitle": "Página no encontrada",
+    "notFoundText": "La página que buscas no existe o se ha movido."
+  },
   "Landing": {
     "eyebrow": "Todo tu curso, en un solo lugar",
     "titleStart": "Menos caos. Más tiempo para",

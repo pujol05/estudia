@@ -2,6 +2,14 @@
   "HomePage": {
     "title": "Overview"
   },
+  "ErrorPages": {
+    "title": "Something went wrong",
+    "text": "An unexpected error occurred. Try again or go back home.",
+    "retry": "Try again",
+    "backHome": "Back home",
+    "notFoundTitle": "Page not found",
+    "notFoundText": "The page you're looking for doesn't exist or has moved."
+  },
   "Landing": {
     "eyebrow": "Your whole term, in one place",
     "titleStart": "Less chaos. More time to",

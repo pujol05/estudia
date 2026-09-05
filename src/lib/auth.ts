@@ -23,7 +23,8 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    // TODO: re-enable once verification email delivery is confirmed working in production.
+    requireEmailVerification: false,
     revokeSessionsOnPasswordReset: true,
     resetPasswordTokenExpiresIn: 3600,
     sendResetPassword: async ({ user, url }, request) => {
@@ -45,6 +46,19 @@ export const auth = betterAuth({
         url,
         request,
       });
+    },
+  },
+
+  rateLimit: {
+    enabled: true,
+    storage: "database",
+    window: 60,
+    max: 20,
+    customRules: {
+      "/sign-in/email": { window: 60, max: 5 },
+      "/sign-up/email": { window: 60, max: 5 },
+      "/request-password-reset": { window: 60, max: 3 },
+      "/send-verification-email": { window: 60, max: 3 },
     },
   },
 
