@@ -108,7 +108,10 @@ export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-      updateEmailWithoutVerification: true,
+      // better-auth only honours this while the current address is unverified,
+      // which requireEmailVerification already rules out — but leaving it on
+      // would silently reopen the hole if verification were ever turned off.
+      updateEmailWithoutVerification: false,
     },
   },
 

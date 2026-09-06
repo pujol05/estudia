@@ -18,7 +18,9 @@ const contentSecurityPolicy = [
   "img-src 'self' blob: data: https://*.public.blob.vercel-storage.com",
   // next/font self-hosts Google Fonts at build time, so no external origin.
   "font-src 'self'",
-  "connect-src 'self' https://challenges.cloudflare.com https://va.vercel-scripts.com",
+  // Client-side avatar uploads talk to the Blob API on vercel.com and then PUT
+  // the file straight to the store, so both origins have to be reachable.
+  "connect-src 'self' https://challenges.cloudflare.com https://va.vercel-scripts.com https://vercel.com https://*.vercel-storage.com",
   // The Turnstile widget renders inside an iframe served by Cloudflare.
   "frame-src https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
