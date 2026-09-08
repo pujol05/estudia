@@ -4,6 +4,7 @@ import { Figtree } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { siteUrl } from "@/lib/site-url";
 import Header from "@/components/layout/header/Header";
 import Footer from "@/components/layout/footer/Footer";
 
@@ -19,6 +20,9 @@ const figtree = Figtree({
 
 
 export const metadata: Metadata = {
+  // Base for resolving relative URLs in metadata (Open Graph images, etc.)
+  // across every page that doesn't set its own absolute one.
+  metadataBase: new URL(siteUrl),
   title: "Estudia",
   description: "Study management web application",
 };

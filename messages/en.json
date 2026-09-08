@@ -11,6 +11,8 @@
     "notFoundText": "The page you're looking for doesn't exist or has moved."
   },
   "Landing": {
+    "metaTitle": "Estudia — Less chaos, more time to learn",
+    "metaDescription": "Organize subjects, tasks, exams and study hours in one place. Free and ad-free.",
     "eyebrow": "Your whole term, in one place",
     "titleStart": "Less chaos. More time to",
     "titleHighlight": "learn.",
@@ -184,6 +186,8 @@
     "infrastructureText": "Estudia uses hosting, storage, database, security and email delivery providers that process information only to provide the necessary infrastructure.",
     "cookiesTitle": "Cookies",
     "cookiesText": "Two technical cookies are used: one to keep you signed in for up to 7 days and another to remember the language until you close the browser. There are no analytics or advertising cookies, so no consent banner is needed.",
+    "analyticsTitle": "Analytics",
+    "analyticsText": "Vercel Analytics is used to measure visits anonymously and in aggregate. It does not use cookies or create individual profiles; it only helps understand which pages are visited most.",
     "rightsTitle": "Your rights",
     "rightsText": "You can request access, correction, export or deletion of your data through the contact form.",
     "complaintBefore": "If you believe your data has not been handled correctly, you may submit a complaint to the ",
@@ -580,6 +584,8 @@
   },
   "Auth": {
     "login": {
+      "metaTitle": "Log in | Estudia",
+      "metaDescription": "Sign in to your Estudia account.",
       "title": "Sign in",
       "subtitle": "Access your Estudia account.",
       "email": "Email address",
@@ -593,6 +599,8 @@
       "register": "Create account"
     },
     "register": {
+      "metaTitle": "Create account | Estudia",
+      "metaDescription": "Create a free Estudia account to organize your studies.",
       "title": "Create account",
       "subtitle": "Create your account to start organizing your studies.",
       "name": "Name",
@@ -623,6 +631,7 @@
       "resendError": "The link could not be sent. Try again in a few minutes."
     },
     "forgotPassword": {
+      "metaTitle": "Reset password | Estudia",
       "title": "Recover password",
       "subtitle": "Enter the email address for your account and we will send you a link to create a new password.",
       "email": "Email address",

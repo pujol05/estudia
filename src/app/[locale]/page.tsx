@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { getTranslations } from "next-intl/server";
 
@@ -10,6 +11,18 @@ import prisma from "@/lib/prisma";
 import styles from "@/components/dashboard/Dashboard.module.css";
 
 type Props = { params: Promise<{ locale: string }> };
+
+// Always the marketing copy: logged-in visitors get the dashboard at this
+// same URL, but metadata only ever matters for the logged-out, sharable case.
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Landing" });
+
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
 export default async function Home({ params }: Props) {
   const { locale } = await params;

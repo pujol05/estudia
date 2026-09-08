@@ -55,6 +55,11 @@ export default async function PrivacyPage({ params }: Props) {
         </section>
 
         <section>
+          <h2>{t("analyticsTitle")}</h2>
+          <p>{t("analyticsText")}</p>
+        </section>
+
+        <section>
           <h2>{t("rightsTitle")}</h2>
           <p>{t("rightsText")}</p>
           <p>

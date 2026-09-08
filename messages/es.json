@@ -11,6 +11,8 @@
     "notFoundText": "La página que buscas no existe o se ha movido."
   },
   "Landing": {
+    "metaTitle": "Estudia — Menos caos, más tiempo para aprender",
+    "metaDescription": "Organiza asignaturas, tareas, exámenes y horas de estudio en un solo lugar. Gratis y sin anuncios.",
     "eyebrow": "Todo tu curso, en un solo lugar",
     "titleStart": "Menos caos. Más tiempo para",
     "titleHighlight": "aprender.",
@@ -184,6 +186,8 @@
     "infrastructureText": "Estudia utiliza proveedores de alojamiento, almacenamiento, base de datos, seguridad y envío de correo que tratan la información únicamente para proporcionar la infraestructura necesaria.",
     "cookiesTitle": "Cookies",
     "cookiesText": "Se utilizan dos cookies técnicas: una para mantener la sesión iniciada durante un máximo de 7 días y otra para recordar el idioma hasta que cierres el navegador. No hay cookies analíticas ni publicitarias, por lo que no es necesario un banner de consentimiento.",
+    "analyticsTitle": "Analítica",
+    "analyticsText": "Se utiliza Vercel Analytics para medir visitas de forma anónima y agregada. No utiliza cookies ni crea perfiles individuales; solo ayuda a entender qué páginas se visitan más.",
     "rightsTitle": "Tus derechos",
     "rightsText": "Puedes solicitar acceso, corrección, exportación o eliminación de tus datos mediante el formulario de contacto.",
     "complaintBefore": "Si consideras que tus datos no se han tratado correctamente, puedes presentar una reclamación ante la ",
@@ -580,6 +584,8 @@
   },
   "Auth": {
     "login": {
+      "metaTitle": "Iniciar sesión | Estudia",
+      "metaDescription": "Accede a tu cuenta de Estudia.",
       "title": "Iniciar sesión",
       "subtitle": "Accede a tu cuenta de Estudia.",
       "email": "Correo electrónico",
@@ -593,6 +599,8 @@
       "register": "Crear cuenta"
     },
     "register": {
+      "metaTitle": "Crear cuenta | Estudia",
+      "metaDescription": "Crea una cuenta gratuita en Estudia para organizar tus estudios.",
       "title": "Crear cuenta",
       "subtitle": "Crea tu cuenta para empezar a organizar tus estudios.",
       "name": "Nombre",
@@ -623,6 +631,7 @@
       "resendError": "No se ha podido enviar el enlace. Inténtalo de nuevo dentro de unos minutos."
     },
     "forgotPassword": {
+      "metaTitle": "Recuperar contraseña | Estudia",
       "title": "Recuperar contraseña",
       "subtitle": "Introduce el correo de tu cuenta y te enviaremos un enlace para crear una contraseña nueva.",
       "email": "Correo electrónico",

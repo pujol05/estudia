@@ -11,6 +11,8 @@
     "notFoundText": "La pàgina que busques no existeix o s'ha mogut."
   },
   "Landing": {
+    "metaTitle": "Estudia — Menys caos, més temps per aprendre",
+    "metaDescription": "Organitza assignatures, tasques, exàmens i hores d’estudi en un sol lloc. Gratuït i sense anuncis.",
     "eyebrow": "Tot el teu curs, en un sol lloc",
     "titleStart": "Menys caos. Més temps per",
     "titleHighlight": "aprendre.",
@@ -184,6 +186,8 @@
     "infrastructureText": "Estudia utilitza proveïdors d’allotjament, emmagatzematge, base de dades, seguretat i enviament de correu que tracten la informació només per proporcionar la infraestructura necessària.",
     "cookiesTitle": "Cookies",
     "cookiesText": "S’utilitzen dues cookies tècniques: una per mantenir la sessió iniciada fins a 7 dies i una altra per recordar l’idioma fins que tanques el navegador. No hi ha cookies analítiques ni publicitàries, per això no cal un bàner de consentiment.",
+    "analyticsTitle": "Analítica",
+    "analyticsText": "S’utilitza Vercel Analytics per mesurar visites de manera anònima i agregada. No utilitza cookies ni crea perfils individuals; només ajuda a entendre quines pàgines es visiten més.",
     "rightsTitle": "Els teus drets",
     "rightsText": "Pots demanar accés, correcció, exportació o eliminació de les teves dades mitjançant el formulari de contacte.",
     "complaintBefore": "Si consideres que les teves dades no s’han tractat correctament, pots presentar una reclamació davant l’",
@@ -580,6 +584,8 @@
   },
   "Auth": {
     "login": {
+      "metaTitle": "Iniciar sessió | Estudia",
+      "metaDescription": "Accedeix al teu compte d’Estudia.",
       "title": "Iniciar sessió",
       "subtitle": "Accedeix al teu compte d'Estudia.",
       "email": "Correu electrònic",
@@ -593,6 +599,8 @@
       "register": "Crear compte"
     },
     "register": {
+      "metaTitle": "Crear compte | Estudia",
+      "metaDescription": "Crea un compte gratuït a Estudia per organitzar els teus estudis.",
       "title": "Crear compte",
       "subtitle": "Crea el teu compte per començar a organitzar els teus estudis.",
       "name": "Nom",
@@ -623,6 +631,7 @@
       "resendError": "No s'ha pogut enviar l'enllaç. Torna-ho a provar d'aquí a uns minuts."
     },
     "forgotPassword": {
+      "metaTitle": "Recuperar contrasenya | Estudia",
       "title": "Recuperar contrasenya",
       "subtitle": "Introdueix el correu del teu compte i t’enviarem un enllaç per crear una contrasenya nova.",
       "email": "Correu electrònic",
