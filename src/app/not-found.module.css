@@ -1,0 +1,91 @@
+.wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 20px;
+  background-color: var(--background-page);
+  font-family: var(--font-figtree), Arial, Helvetica, sans-serif;
+}
+
+.card {
+  width: min(480px, 100%);
+  padding: 32px;
+  background: var(--color-white);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgb(10 49 67 / 8%);
+  text-align: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  color: var(--color-dark);
+  text-decoration: none;
+}
+
+.mark {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  overflow: hidden;
+  border-radius: 9px;
+}
+
+.mark img {
+  object-fit: cover;
+  transform: scale(1.25);
+}
+
+.name {
+  font-size: 17px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+.code {
+  color: var(--color-primary);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.card h1 {
+  margin-top: 6px;
+  margin-bottom: 10px;
+  color: var(--color-dark);
+  font-size: 24px;
+}
+
+.card p {
+  color: #5b6b72;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.actions {
+  margin-top: 24px;
+}
+
+.actions a {
+  display: inline-block;
+  padding: 11px 20px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.actions a:hover {
+  filter: brightness(1.05);
+}
+
+.actions a:focus-visible {
+  outline: 2px solid #57b9ff;
+  outline-offset: 2px;
+}
