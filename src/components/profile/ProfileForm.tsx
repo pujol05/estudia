@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { upload } from "@vercel/blob/client";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@/i18n/navigation";
@@ -32,12 +32,16 @@ export default function ProfileForm({
   initialImage,
 }: Props) {
   const t = useTranslations("Profile");
+  const locale = useLocale();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
-  const [savedEmail, setSavedEmail] = useState(initialEmail);
+  // The account's real current email, unaffected by whatever is typed in the
+  // field below. Never reassigned: a pending change only takes effect after
+  // both confirmation links are clicked, which happens outside this page.
+  const savedEmail = initialEmail;
   const [image, setImage] = useState(initialImage);
   const [isUpdatingImage, setIsUpdatingImage] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -149,9 +153,19 @@ export default function ProfileForm({
     setIsSaving(true);
 
     try {
-      if (normalizedEmail !== savedEmail.toLowerCase()) {
+      const emailChangeRequested = normalizedEmail !== savedEmail.toLowerCase();
+
+      if (emailChangeRequested) {
+        // better-auth sends this same callbackURL to both the old-address
+        // confirmation link and the new-address verification link that
+        // follows it. The result page (src/app/[locale]/verify-email) tells
+        // the two apart by checking whether the session's email already
+        // matches pendingEmail — so it has to travel through both hops.
+        const callbackURL = `${window.location.origin}/${locale}/verify-email?pendingEmail=${encodeURIComponent(normalizedEmail)}`;
+
         const { error: emailError } = await authClient.changeEmail({
           newEmail: normalizedEmail,
+          callbackURL,
         });
 
         if (emailError) {
@@ -170,9 +184,19 @@ export default function ProfileForm({
       }
 
       setName(normalizedName);
-      setEmail(normalizedEmail);
-      setSavedEmail(normalizedEmail);
-      setSuccess(t("saveSuccess"));
+
+      if (emailChangeRequested) {
+        // The account's email hasn't changed yet: better-auth only applies it
+        // once both the current and the new address have confirmed via the
+        // links it just sent them. Reverting the field to what's actually
+        // still on the account avoids the input silently disagreeing with a
+        // reload once the pending change is confirmed (or ignored).
+        setEmail(savedEmail);
+        setSuccess(t("emailChangePending"));
+      } else {
+        setSuccess(t("saveSuccess"));
+      }
+
       router.refresh();
     } catch {
       setError(t("saveError"));
