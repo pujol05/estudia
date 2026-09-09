@@ -238,7 +238,16 @@
     "save": "Desar canvis",
     "saving": "Desant...",
     "saveSuccess": "Perfil actualitzat correctament.",
-    "saveError": "No s'ha pogut actualitzar el perfil. Torna-ho a provar."
+    "saveError": "No s'ha pogut actualitzar el perfil. Torna-ho a provar.",
+    "deleteTitle": "Eliminar el compte",
+    "deleteWarning": "Aquesta acció esborrarà el teu compte i totes les teves dades (assignatures, tasques, exàmens, notes i esdeveniments). No es pot desfer.",
+    "deleteButton": "Eliminar el meu compte",
+    "deleteConfirmPrompt": "Segur que vols eliminar el compte? T'enviarem un correu de confirmació.",
+    "deleteConfirmButton": "Sí, eliminar el compte",
+    "deleteCancelButton": "Cancel·lar",
+    "deleteSending": "Enviant...",
+    "deletePending": "T'hem enviat un correu a {email}. Obre'l amb la sessió iniciada en aquest navegador per completar l'eliminació.",
+    "deleteError": "No s'ha pogut enviar el correu de confirmació. Torna-ho a provar."
   },
   "Subjects": {
     "title": "Assignatures",
@@ -674,5 +683,10 @@
       "invalidText": "Aquest enllaç no és vàlid o ja s'ha utilitzat. Inicia sessió i te n'enviarem un de nou.",
       "backToLogin": "Iniciar sessió"
     }
+  },
+  "AccountDeleted": {
+    "title": "Compte eliminat",
+    "text": "El teu compte i totes les teves dades s’han eliminat correctament. Gràcies per haver fet servir Estudia.",
+    "backHome": "Anar a l’inici"
   }
 }

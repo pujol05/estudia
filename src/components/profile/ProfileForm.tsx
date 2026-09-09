@@ -48,6 +48,11 @@ export default function ProfileForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [deletePending, setDeletePending] = useState(false);
+
   const initial = name.trim().charAt(0).toUpperCase() || "?";
   async function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -205,6 +210,35 @@ export default function ProfileForm({
     }
   }
 
+  async function handleDeleteAccount() {
+    setDeleteError("");
+    setIsDeleting(true);
+
+    try {
+      // The confirmation link this triggers only works while the person
+      // clicking it is signed in on that browser (better-auth checks the
+      // session, not just the token) — there's no cross-device magic link
+      // here the way there is for verifying a new email address.
+      const callbackURL = `${window.location.origin}/${locale}/account-deleted`;
+
+      const { error: deleteRequestError } = await authClient.deleteUser({
+        callbackURL,
+      });
+
+      if (deleteRequestError) {
+        setDeleteError(t("deleteError"));
+        return;
+      }
+
+      setDeletePending(true);
+      setIsConfirmingDelete(false);
+    } catch {
+      setDeleteError(t("deleteError"));
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <section className={styles.profile}>
       <div className={styles.heading}>
@@ -324,6 +358,55 @@ export default function ProfileForm({
           </button>
         </div>
       </form>
+
+      <section className={styles.dangerZone}>
+        <h2>{t("deleteTitle")}</h2>
+        <p>{t("deleteWarning")}</p>
+
+        {deletePending ? (
+          <p className={styles.success} role="status">
+            {t("deletePending", { email: savedEmail })}
+          </p>
+        ) : isConfirmingDelete ? (
+          <>
+            <p className={styles.dangerPrompt}>{t("deleteConfirmPrompt")}</p>
+
+            {deleteError && (
+              <p className={styles.error} role="alert">
+                {deleteError}
+              </p>
+            )}
+
+            <div className={styles.dangerActions}>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => setIsConfirmingDelete(false)}
+                disabled={isDeleting}
+              >
+                {t("deleteCancelButton")}
+              </button>
+
+              <button
+                type="button"
+                className={styles.dangerButton}
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+              >
+                {isDeleting ? t("deleteSending") : t("deleteConfirmButton")}
+              </button>
+            </div>
+          </>
+        ) : (
+          <button
+            type="button"
+            className={styles.textButton}
+            onClick={() => setIsConfirmingDelete(true)}
+          >
+            {t("deleteButton")}
+          </button>
+        )}
+      </section>
     </section>
   );
 }

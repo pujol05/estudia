@@ -195,7 +195,72 @@
   cursor: not-allowed;
 }
 
+.dangerZone {
+  margin-top: 28px;
+  padding: 28px 36px;
+  background-color: var(--color-white);
+  border: 1px solid #f3c9c2;
+  border-radius: 12px;
+}
+
+.dangerZone h2 {
+  margin-bottom: 8px;
+  color: #9b2c20;
+  font-size: 18px;
+}
+
+.dangerZone p {
+  color: #5f6b72;
+  line-height: 1.5;
+}
+
+.dangerPrompt {
+  margin-top: 12px;
+  color: #9b2c20;
+  font-weight: 600;
+}
+
+.dangerActions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.dangerButton {
+  padding: 10px 14px;
+  background-color: #9b2c20;
+  color: var(--color-white);
+  border: 0;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dangerButton:hover {
+  filter: brightness(1.08);
+}
+
+.dangerButton:focus-visible {
+  outline: 2px solid #9b2c20;
+  outline-offset: 2px;
+}
+
+.dangerButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 640px) {
+  .dangerZone {
+    padding: 20px;
+  }
+
+  .dangerActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .profile {
     padding: 40px 20px 56px;
   }

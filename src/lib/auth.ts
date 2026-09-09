@@ -6,6 +6,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 
 import prisma from "@/lib/prisma";
+import { sendAccountDeletionEmail } from "@/lib/account-deletion-email";
 import { sendEmailChangeConfirmation } from "@/lib/email-change-confirmation-email";
 import { sendPasswordResetEmail } from "@/lib/password-reset-email";
 import { sendVerificationEmail } from "@/lib/verification-email";
@@ -121,6 +122,16 @@ export const auth = betterAuth({
         await sendEmailChangeConfirmation({
           email: user.email,
           newEmail,
+          url,
+          request,
+        });
+      },
+    },
+    deleteUser: {
+      enabled: true,
+      sendDeleteAccountVerification: async ({ user, url }, request) => {
+        await sendAccountDeletionEmail({
+          email: user.email,
           url,
           request,
         });

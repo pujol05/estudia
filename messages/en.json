@@ -238,7 +238,16 @@
     "save": "Save changes",
     "saving": "Saving...",
     "saveSuccess": "Profile updated successfully.",
-    "saveError": "The profile could not be updated. Please try again."
+    "saveError": "The profile could not be updated. Please try again.",
+    "deleteTitle": "Delete account",
+    "deleteWarning": "This will erase your account and all your data (subjects, tasks, exams, grades and events). This cannot be undone.",
+    "deleteButton": "Delete my account",
+    "deleteConfirmPrompt": "Are you sure you want to delete your account? We'll send you a confirmation email.",
+    "deleteConfirmButton": "Yes, delete my account",
+    "deleteCancelButton": "Cancel",
+    "deleteSending": "Sending...",
+    "deletePending": "We sent an email to {email}. Open it while signed in on this browser to finish deleting the account.",
+    "deleteError": "The confirmation email could not be sent. Try again."
   },
   "Subjects": {
     "title": "Subjects",
@@ -674,5 +683,10 @@
       "invalidText": "This link is not valid or has already been used. Sign in and we will send you a new one.",
       "backToLogin": "Sign in"
     }
+  },
+  "AccountDeleted": {
+    "title": "Account deleted",
+    "text": "Your account and all your data have been deleted. Thanks for using Estudia.",
+    "backHome": "Go to home"
   }
 }

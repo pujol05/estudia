@@ -238,7 +238,16 @@
     "save": "Guardar cambios",
     "saving": "Guardando...",
     "saveSuccess": "Perfil actualizado correctamente.",
-    "saveError": "No se ha podido actualizar el perfil. Vuelve a intentarlo."
+    "saveError": "No se ha podido actualizar el perfil. Vuelve a intentarlo.",
+    "deleteTitle": "Eliminar la cuenta",
+    "deleteWarning": "Esta acción borrará tu cuenta y todos tus datos (asignaturas, tareas, exámenes, notas y eventos). No se puede deshacer.",
+    "deleteButton": "Eliminar mi cuenta",
+    "deleteConfirmPrompt": "¿Seguro que quieres eliminar la cuenta? Te enviaremos un correo de confirmación.",
+    "deleteConfirmButton": "Sí, eliminar la cuenta",
+    "deleteCancelButton": "Cancelar",
+    "deleteSending": "Enviando...",
+    "deletePending": "Te hemos enviado un correo a {email}. Ábrelo con la sesión iniciada en este navegador para completar la eliminación.",
+    "deleteError": "No se ha podido enviar el correo de confirmación. Inténtalo de nuevo."
   },
   "Subjects": {
     "title": "Asignaturas",
@@ -674,5 +683,10 @@
       "invalidText": "Este enlace no es válido o ya se ha utilizado. Inicia sesión y te enviaremos uno nuevo.",
       "backToLogin": "Iniciar sesión"
     }
+  },
+  "AccountDeleted": {
+    "title": "Cuenta eliminada",
+    "text": "Tu cuenta y todos tus datos se han eliminado correctamente. Gracias por haber usado Estudia.",
+    "backHome": "Ir al inicio"
   }
 }
