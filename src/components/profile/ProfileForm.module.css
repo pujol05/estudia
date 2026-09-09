@@ -214,6 +214,30 @@
   line-height: 1.5;
 }
 
+.dangerZone > .dangerOutlineButton {
+  margin-top: 16px;
+}
+
+.dangerOutlineButton {
+  padding: 10px 14px;
+  background-color: transparent;
+  color: #9b2c20;
+  border: 1px solid #9b2c20;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dangerOutlineButton:hover {
+  background-color: #fff2f0;
+}
+
+.dangerOutlineButton:focus-visible {
+  outline: 2px solid #9b2c20;
+  outline-offset: 2px;
+}
+
 .dangerPrompt {
   margin-top: 12px;
   color: #9b2c20;

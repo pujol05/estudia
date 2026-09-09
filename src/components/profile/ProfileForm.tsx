@@ -400,7 +400,7 @@ export default function ProfileForm({
         ) : (
           <button
             type="button"
-            className={styles.textButton}
+            className={styles.dangerOutlineButton}
             onClick={() => setIsConfirmingDelete(true)}
           >
             {t("deleteButton")}
