@@ -77,6 +77,10 @@ export const auth = betterAuth({
       "/sign-up/email": { window: 60, max: 5 },
       "/request-password-reset": { window: 60, max: 3 },
       "/send-verification-email": { window: 60, max: 3 },
+      // Both require an active session and only trigger an email, but they
+      // fire the same email-sending machinery as the rules above — same limit.
+      "/change-email": { window: 60, max: 3 },
+      "/delete-user": { window: 60, max: 3 },
     },
   },
 
