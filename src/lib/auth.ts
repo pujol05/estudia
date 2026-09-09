@@ -6,6 +6,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 
 import prisma from "@/lib/prisma";
+import { sendEmailChangeConfirmation } from "@/lib/email-change-confirmation-email";
 import { sendPasswordResetEmail } from "@/lib/password-reset-email";
 import { sendVerificationEmail } from "@/lib/verification-email";
 import { type TurnstileAction, verifyTurnstileToken } from "@/lib/turnstile";
@@ -57,6 +58,10 @@ export const auth = betterAuth({
         email: user.email,
         url,
         request,
+        // better-auth reuses this callback for /change-email too. A freshly
+        // created account always has emailVerified: false, so `true` here
+        // can only mean an already-verified user is confirming a new address.
+        isEmailChange: user.emailVerified === true,
       });
     },
   },
@@ -112,6 +117,14 @@ export const auth = betterAuth({
       // which requireEmailVerification already rules out — but leaving it on
       // would silently reopen the hole if verification were ever turned off.
       updateEmailWithoutVerification: false,
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }, request) => {
+        await sendEmailChangeConfirmation({
+          email: user.email,
+          newEmail,
+          url,
+          request,
+        });
+      },
     },
   },
 
