@@ -25,6 +25,9 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Estudia",
   description: "Study management web application",
+  verification: {
+    google: "ATCyI1c51BO_R-s3YqO8GxnLLtUHvMLKYjfAetG3erY",
+  },
 };
 
 // li diu a typescript quines dades rebra de rootlayout. (children, params)
