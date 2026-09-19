@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 
 import LandingPage from "@/components/landing/LandingPage";
 import Onboarding from "@/components/dashboard/Onboarding";
+import FormattedDateTime from "@/components/dashboard/FormattedDateTime";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
@@ -77,7 +78,6 @@ export default async function Home({ params }: Props) {
   const average = totalGradeWeight > 0
     ? grades.reduce((sum, grade) => sum + (grade.score / grade.maxScore) * 10 * grade.weight, 0) / totalGradeWeight
     : null;
-  const formatter = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
   const firstName = session.user.name.trim().split(/\s+/)[0];
   const reminderLimit = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1_000);
   const reminders = [
@@ -130,12 +130,12 @@ export default async function Home({ params }: Props) {
       <div className={styles.dashboardGrid}>
         <section className={styles.panel}>
           <div className={styles.panelHeading}><h2>{t("nextTasks")}</h2><Link href="/tasks">{t("viewAll")}</Link></div>
-          {upcomingTasks.length === 0 ? <p className={styles.empty}>{t("noUpcomingTasks")}</p> : <div className={styles.rows}>{upcomingTasks.map((task) => <article className={styles.row} key={task.id}><span className={`${styles.rowIcon} ${styles.blue}`}>T</span><div className={styles.rowText}><strong>{task.title}</strong><small>{task.subject.name}</small></div><div className={styles.rowDate}><strong>{task.dueDate ? formatter.format(task.dueDate) : ""}</strong><span className={`${styles.pill} ${task.priority === "HIGH" ? styles.redPill : task.priority === "LOW" ? styles.greenPill : styles.yellowPill}`}>{t(`priority${task.priority[0]}${task.priority.slice(1).toLowerCase()}`)}</span></div></article>)}</div>}
+          {upcomingTasks.length === 0 ? <p className={styles.empty}>{t("noUpcomingTasks")}</p> : <div className={styles.rows}>{upcomingTasks.map((task) => <article className={styles.row} key={task.id}><span className={`${styles.rowIcon} ${styles.blue}`}>T</span><div className={styles.rowText}><strong>{task.title}</strong><small>{task.subject.name}</small></div><div className={styles.rowDate}><strong>{task.dueDate ? <FormattedDateTime date={task.dueDate.toISOString()} locale={locale} /> : ""}</strong><span className={`${styles.pill} ${task.priority === "HIGH" ? styles.redPill : task.priority === "LOW" ? styles.greenPill : styles.yellowPill}`}>{t(`priority${task.priority[0]}${task.priority.slice(1).toLowerCase()}`)}</span></div></article>)}</div>}
         </section>
 
         <section className={styles.panel}>
           <div className={styles.panelHeading}><h2>{t("nextExams")}</h2><Link href="/exams">{t("viewAll")}</Link></div>
-          {upcomingExams.length === 0 ? <p className={styles.empty}>{t("noUpcomingExams")}</p> : <div className={styles.rows}>{upcomingExams.map((exam) => <article className={styles.row} key={exam.id}><span className={`${styles.rowIcon} ${styles.purple}`}>E</span><div className={styles.rowText}><strong>{exam.subject.name}</strong><small>{exam.title}</small></div><div className={styles.rowDate}><strong>{formatter.format(exam.examDate)}</strong><span className={styles.pill}>{t(`exam${exam.type[0]}${exam.type.slice(1).toLowerCase()}`)}</span></div></article>)}</div>}
+          {upcomingExams.length === 0 ? <p className={styles.empty}>{t("noUpcomingExams")}</p> : <div className={styles.rows}>{upcomingExams.map((exam) => <article className={styles.row} key={exam.id}><span className={`${styles.rowIcon} ${styles.purple}`}>E</span><div className={styles.rowText}><strong>{exam.subject.name}</strong><small>{exam.title}</small></div><div className={styles.rowDate}><strong><FormattedDateTime date={exam.examDate.toISOString()} locale={locale} /></strong><span className={styles.pill}>{t(`exam${exam.type[0]}${exam.type.slice(1).toLowerCase()}`)}</span></div></article>)}</div>}
         </section>
 
         <section className={`${styles.panel} ${styles.subjectPanel}`}>
@@ -145,7 +145,7 @@ export default async function Home({ params }: Props) {
 
         <section className={styles.panel}>
           <div className={styles.panelHeading}><h2>{t("agenda")}</h2><Link href="/events">{t("viewAll")}</Link></div>
-          {upcomingEvents.length === 0 ? <p className={styles.empty}>{t("noEvents")}</p> : <div className={styles.rows}>{upcomingEvents.map((event) => <article className={styles.row} key={event.id}><span className={`${styles.rowIcon} ${styles.green}`}>D</span><div className={styles.rowText}><strong>{event.title}</strong><small>{event.subject?.name ?? t("personalEvent")}</small></div><div className={styles.rowDate}><strong>{formatter.format(event.startsAt)}</strong><span className={styles.pill}>{t(`event${event.type[0]}${event.type.slice(1).toLowerCase()}`)}</span></div></article>)}</div>}
+          {upcomingEvents.length === 0 ? <p className={styles.empty}>{t("noEvents")}</p> : <div className={styles.rows}>{upcomingEvents.map((event) => <article className={styles.row} key={event.id}><span className={`${styles.rowIcon} ${styles.green}`}>D</span><div className={styles.rowText}><strong>{event.title}</strong><small>{event.subject?.name ?? t("personalEvent")}</small></div><div className={styles.rowDate}><strong><FormattedDateTime date={event.startsAt.toISOString()} locale={locale} /></strong><span className={styles.pill}>{t(`event${event.type[0]}${event.type.slice(1).toLowerCase()}`)}</span></div></article>)}</div>}
         </section>
 
         <section className={styles.panel}>

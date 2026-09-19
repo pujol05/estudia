@@ -373,7 +373,11 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
                         <button className={styles.compactMain} type="button" onClick={() => toggleTaskDetails(task.id)} aria-expanded={isExpanded} aria-controls={`task-details-${task.id}`}>
                           <span className={styles.compactIdentity}><strong className={task.status === "DONE" ? shared.completedTitle : ""}>{task.title}</strong><small>({task.subject.name})</small></span>
                           <span className={styles.compactHours}>{formatMinutes(totalMinutes)}</span>
-                          <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ""}`} aria-hidden="true">⌄</span>
+                          <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ""}`} aria-hidden="true">
+                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </span>
                         </button>
                         <button className={styles.quickStudy} type="button" onClick={() => startStudy(task.id)} disabled={busy !== null}><span aria-hidden="true">▶</span>{t("study")}</button>
                       </div>

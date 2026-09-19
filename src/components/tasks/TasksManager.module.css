@@ -24,7 +24,7 @@
 .compactIdentity strong { font-size: 14px; }
 .compactIdentity small { color: #6f7d83; font-size: 11px; }
 .compactHours { color: #5d7078; font-size: 11px; font-weight: 750; white-space: nowrap; }
-.chevron { color: #738188; font-size: 17px; line-height: 1; transform: rotate(0deg); transition: transform .16s ease; }
+.chevron { display: inline-flex; flex: 0 0 16px; align-items: center; justify-content: center; width: 16px; height: 16px; color: #738188; transform: rotate(0deg); transition: transform .16s ease; }
 .chevronOpen { transform: rotate(180deg); }
 .quickStudy { display: inline-flex; align-items: center; gap: 5px; margin: 8px 8px 8px 0; padding: 7px 9px; align-self: center; background: #eaf7ef; color: #2d784e; border: 0; border-radius: 7px; font: inherit; font-size: 11px; font-weight: 800; white-space: nowrap; cursor: pointer; }
 .quickStudy span { font-size: 8px; }
