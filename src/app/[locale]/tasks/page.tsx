@@ -49,6 +49,7 @@ export default async function TasksPage({ params }: Props) {
         description: true,
         dueDate: true,
         completed: true,
+        completedAt: true,
         status: true,
         priority: true,
         subject: { select: { id: true, name: true } },
@@ -77,6 +78,7 @@ export default async function TasksPage({ params }: Props) {
   return (
     <TasksManager
       key={`${studySessions.length}:${studySessions[0]?.id ?? "none"}:${tasks.length}`}
+      referenceTime={new Date().toISOString()}
       initialSubjects={subjects}
       initialStudySessions={studySessions.map((studySession) => ({
         ...studySession,
@@ -88,6 +90,7 @@ export default async function TasksPage({ params }: Props) {
       initialTasks={tasks.map((task) => ({
         ...task,
         dueDate: task.dueDate?.toISOString() ?? null,
+        completedAt: task.completedAt?.toISOString() ?? null,
         priority: task.priority as TaskPriority,
         status: task.status as TaskStatus,
         timeEntries: task.timeEntries.map((entry) => ({

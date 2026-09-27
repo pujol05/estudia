@@ -27,6 +27,7 @@ export type TaskSummary = {
   description: string | null;
   dueDate: string | null;
   completed: boolean;
+  completedAt: string | null;
   status: TaskStatus;
   priority: TaskPriority;
   subject: SubjectOption;

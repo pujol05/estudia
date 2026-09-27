@@ -8,6 +8,7 @@ import styles from "@/components/academic/AcademicManager.module.css";
 import calendarStyles from "@/components/events/EventsManager.module.css";
 import { useRouter } from "@/i18n/navigation";
 import type { EventRecurrence, EventSummary, EventType, SubjectOption } from "@/lib/academic-types";
+import { normalizeSearchText } from "@/lib/search";
 
 type Props = { referenceTime: string; initialSubjects: SubjectOption[]; initialEvents: EventSummary[] };
 type EventFilter = "upcoming" | "past" | "all";
@@ -149,10 +150,10 @@ export default function EventsManager({ referenceTime, initialSubjects, initialE
   const dayFormatter = useMemo(() => new Intl.DateTimeFormat(locale, { day: "numeric" }), [locale]);
 
   const matchingEvents = useMemo(() => {
-    const search = query.trim().toLocaleLowerCase(locale);
+    const search = normalizeSearchText(query.trim(), locale);
     return events.filter((event) => (
       (subjectFilter === "all" || (subjectFilter === "none" ? event.subject === null : event.subject?.id === subjectFilter))
-      && (!search || `${event.title} ${event.description ?? ""} ${event.location ?? ""} ${event.subject?.name ?? ""}`.toLocaleLowerCase(locale).includes(search))
+      && (!search || normalizeSearchText(`${event.title} ${event.description ?? ""} ${event.location ?? ""} ${event.subject?.name ?? ""}`, locale).includes(search))
     ));
   }, [events, locale, query, subjectFilter]);
 

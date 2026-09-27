@@ -38,6 +38,7 @@ const taskSelect = {
   description: true,
   dueDate: true,
   completed: true,
+  completedAt: true,
   status: true,
   priority: true,
   subject: { select: { id: true, name: true } },
@@ -53,6 +54,7 @@ function serializeTask(task: {
   description: string | null;
   dueDate: Date | null;
   completed: boolean;
+  completedAt: Date | null;
   status: string;
   priority: string;
   subject: { id: string; name: string };
@@ -61,6 +63,7 @@ function serializeTask(task: {
   return {
     ...task,
     dueDate: task.dueDate?.toISOString() ?? null,
+    completedAt: task.completedAt?.toISOString() ?? null,
     priority: task.priority as TaskPriority,
     status: task.status as TaskStatus,
     timeEntries: task.timeEntries.map((entry) => ({
@@ -82,6 +85,17 @@ function validateInput(input: TaskInput) {
   return { title, description, dueDate, priority, status, completed: status === "DONE" };
 }
 
+// Only non-DONE tasks have a null completedAt, so re-saving a DONE task keeps
+// its original completion time instead of making it "recent" again.
+async function completedAtFor(taskId: string, userId: string, status: TaskStatus) {
+  if (status !== "DONE") return null;
+  const current = await prisma.task.findFirst({
+    where: { id: taskId, subject: { userId } },
+    select: { completedAt: true },
+  });
+  return current?.completedAt ?? new Date();
+}
+
 async function findOwnedTask(taskId: string, userId: string) {
   return prisma.task.findFirst({
     where: { id: taskId, subject: { userId } },
@@ -101,7 +115,7 @@ export async function createTaskAction(input: TaskInput): Promise<TaskResult> {
 
   try {
     const task = await prisma.task.create({
-      data: { ...data, subjectId: input.subjectId },
+      data: { ...data, completedAt: data.status === "DONE" ? new Date() : null, subjectId: input.subjectId },
       select: taskSelect,
     });
     return { ok: true, task: serializeTask(task) };
@@ -124,7 +138,7 @@ export async function updateTaskAction(taskId: string, input: TaskInput): Promis
   try {
     const result = await prisma.task.updateMany({
       where: { id: taskId, subject: { userId } },
-      data: { ...data, subjectId: input.subjectId },
+      data: { ...data, completedAt: await completedAtFor(taskId, userId, data.status), subjectId: input.subjectId },
     });
     if (result.count === 0) return { ok: false, error: "notFound" };
 
@@ -144,7 +158,7 @@ export async function setTaskStatusAction(taskId: string, status: TaskStatus): P
   try {
     const result = await prisma.task.updateMany({
       where: { id: taskId, subject: { userId } },
-      data: { status, completed: status === "DONE" },
+      data: { status, completed: status === "DONE", completedAt: await completedAtFor(taskId, userId, status) },
     });
     if (result.count === 0) return { ok: false, error: "notFound" };
 

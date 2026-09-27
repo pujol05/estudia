@@ -11,6 +11,7 @@ import {
 import styles from "@/components/academic/AcademicManager.module.css";
 import { Link, useRouter } from "@/i18n/navigation";
 import type { GradeSummary, SubjectOption } from "@/lib/academic-types";
+import { normalizeSearchText } from "@/lib/search";
 
 type Props = { initialSubjects: SubjectOption[]; initialGrades: GradeSummary[] };
 
@@ -37,13 +38,12 @@ export default function GradesManager({ initialSubjects, initialGrades }: Props)
   );
 
   const filtered = useMemo(() => {
-    const search = query.trim().toLocaleLowerCase(locale);
+    const search = normalizeSearchText(query.trim(), locale);
     return grades.filter(
       (grade) =>
         (subjectFilter === "all" || grade.subject.id === subjectFilter) &&
         (!search ||
-          `${grade.title} ${grade.subject.name}`
-            .toLocaleLowerCase(locale)
+          normalizeSearchText(`${grade.title} ${grade.subject.name}`, locale)
             .includes(search)),
     );
   }, [grades, locale, query, subjectFilter]);

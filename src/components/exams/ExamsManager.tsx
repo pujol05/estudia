@@ -7,6 +7,7 @@ import { createExamAction, deleteExamAction, updateExamAction, type ExamInput } 
 import styles from "@/components/academic/AcademicManager.module.css";
 import { useRouter } from "@/i18n/navigation";
 import type { ExamSummary, ExamType, SubjectOption } from "@/lib/academic-types";
+import { normalizeSearchText } from "@/lib/search";
 
 type Props = { referenceTime: string; initialSubjects: SubjectOption[]; initialExams: ExamSummary[] };
 type ExamFilter = "upcoming" | "past" | "all";
@@ -38,12 +39,12 @@ export default function ExamsManager({ referenceTime, initialSubjects, initialEx
 
   const filteredExams = useMemo(() => {
     const now = new Date(referenceTime).getTime();
-    const search = query.trim().toLocaleLowerCase(locale);
+    const search = normalizeSearchText(query.trim(), locale);
     return exams.filter((exam) => {
       const isPast = exam.completed || new Date(exam.examDate).getTime() < now;
       const matchesFilter = filter === "all" || (filter === "past" ? isPast : !isPast);
       const matchesSubject = subjectFilter === "all" || exam.subject.id === subjectFilter;
-      const matchesSearch = !search || `${exam.title} ${exam.subject.name} ${exam.description ?? ""}`.toLocaleLowerCase(locale).includes(search);
+      const matchesSearch = !search || normalizeSearchText(`${exam.title} ${exam.subject.name} ${exam.description ?? ""}`, locale).includes(search);
       return matchesFilter && matchesSubject && matchesSearch;
     });
   }, [exams, filter, locale, query, referenceTime, subjectFilter]);

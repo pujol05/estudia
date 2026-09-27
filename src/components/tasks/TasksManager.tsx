@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore, type DragEvent, type FormEvent } from "react";
+import { useMemo, useState, useSyncExternalStore, type CSSProperties, type DragEvent, type FormEvent, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 import {
@@ -13,16 +13,23 @@ import {
 } from "@/app/[locale]/tasks/actions";
 import { useRouter } from "@/i18n/navigation";
 import type { StudySessionSummary, SubjectOption, TaskPriority, TaskStatus, TaskSummary } from "@/lib/academic-types";
+import { normalizeSearchText } from "@/lib/search";
 import { START_STUDY_EVENT } from "@/lib/study-timer-events";
 
 import shared from "@/components/academic/AcademicManager.module.css";
 import styles from "@/components/tasks/TasksManager.module.css";
 
-type Props = { initialSubjects: SubjectOption[]; initialTasks: TaskSummary[]; initialStudySessions: StudySessionSummary[] };
+type Props = { referenceTime: string; initialSubjects: SubjectOption[]; initialTasks: TaskSummary[]; initialStudySessions: StudySessionSummary[] };
 type Feedback = { type: "error" | "success"; text: string } | null;
 type PeriodMode = "day" | "week";
+type TaskGroup = { subject: SubjectOption; tasks: TaskSummary[]; minutes: number };
+type ColumnView = { recent: TaskSummary[]; groups: TaskGroup[] };
 
 const STATUSES: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
+const RECENT_DONE_MS = 24 * 60 * 60 * 1000;
+// Picked by position in the alphabetical subject list, so each subject keeps
+// the same colour in every column.
+const SUBJECT_COLORS = ["#e07a5f", "#3d9a8b", "#8e6cc9", "#d49a1a", "#4a8fd4", "#d0648a", "#6b9e3f", "#b86f3a"];
 const subscribeToBrowserDate = () => () => {};
 const EMPTY_FORM: TaskInput = {
   title: "",
@@ -49,6 +56,10 @@ function toIso(value: string | null) {
   return value ? new Date(value).toISOString() : null;
 }
 
+function taskMinutes(task: TaskSummary) {
+  return task.timeEntries.reduce((sum, entry) => sum + entry.minutes, 0);
+}
+
 function getWeekRange(value: string) {
   if (!value) return { start: "", end: "" };
   const date = new Date(`${value}T00:00:00.000Z`);
@@ -60,7 +71,7 @@ function getWeekRange(value: string) {
   return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
 }
 
-export default function TasksManager({ initialSubjects, initialTasks, initialStudySessions }: Props) {
+export default function TasksManager({ referenceTime, initialSubjects, initialTasks, initialStudySessions }: Props) {
   const t = useTranslations("Tasks");
   const common = useTranslations("Academic");
   const locale = useLocale();
@@ -73,6 +84,7 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
   const [selectedDate, setSelectedDate] = useState("");
   const [periodMode, setPeriodMode] = useState<PeriodMode>("day");
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(() => new Set());
+  const [groupOverrides, setGroupOverrides] = useState<Record<string, boolean>>({});
   const [form, setForm] = useState<TaskInput>(EMPTY_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -84,7 +96,9 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
   const [busy, setBusy] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const defaultBrowserDate = useSyncExternalStore(subscribeToBrowserDate, browserToday, () => "");
+  const isBrowser = useSyncExternalStore(subscribeToBrowserDate, () => true, () => false);
   const activeDate = selectedDate || defaultBrowserDate;
+  const isFiltering = subjectFilter !== "all" || query.trim() !== "";
 
   const dateFormatter = useMemo(
     () => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }),
@@ -98,15 +112,42 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
     () => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }),
     [locale],
   );
+  const shortDateFormatter = useMemo(
+    () => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }),
+    [locale],
+  );
+  const subjectColors = useMemo(
+    () => new Map(initialSubjects.map((subject, index) => [subject.id, SUBJECT_COLORS[index % SUBJECT_COLORS.length]])),
+    [initialSubjects],
+  );
 
   const visibleTasks = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase(locale);
+    const normalizedQuery = normalizeSearchText(query.trim(), locale);
     return tasks.filter((task) => {
       const matchesSubject = subjectFilter === "all" || task.subject.id === subjectFilter;
-      const matchesQuery = !normalizedQuery || `${task.title} ${task.description ?? ""} ${task.subject.name}`.toLocaleLowerCase(locale).includes(normalizedQuery);
+      const matchesQuery = !normalizedQuery || normalizeSearchText(`${task.title} ${task.description ?? ""} ${task.subject.name}`, locale).includes(normalizedQuery);
       return matchesSubject && matchesQuery;
     });
   }, [locale, query, subjectFilter, tasks]);
+
+  // DONE keeps the last 24 h of completions in view; everything older is
+  // folded into per-subject piles so the column doesn't grow forever.
+  const columns = useMemo(() => {
+    const recentCutoff = new Date(referenceTime).getTime() - RECENT_DONE_MS;
+    return Object.fromEntries(STATUSES.map((status) => {
+      const columnTasks = visibleTasks.filter((task) => task.status === status);
+      const recent = status !== "DONE" ? [] : columnTasks
+        .filter((task) => task.completedAt && new Date(task.completedAt).getTime() >= recentCutoff)
+        .sort((a, b) => (b.completedAt ?? "").localeCompare(a.completedAt ?? ""));
+      const groups = initialSubjects
+        .map((subject) => {
+          const groupTasks = columnTasks.filter((task) => task.subject.id === subject.id && !recent.includes(task));
+          return { subject, tasks: groupTasks, minutes: groupTasks.reduce((sum, task) => sum + taskMinutes(task), 0) };
+        })
+        .filter((group) => group.tasks.length > 0);
+      return [status, { recent, groups }];
+    })) as Record<TaskStatus, ColumnView>;
+  }, [initialSubjects, referenceTime, visibleTasks]);
 
   const periodRange = useMemo(
     () => periodMode === "week" ? getWeekRange(activeDate) : { start: activeDate, end: activeDate },
@@ -132,11 +173,11 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
     .sort((a, b) => b.minutes - a.minutes), [periodRange, visibleTasks]);
 
   const periodSessions = useMemo(() => {
-    const normalizedQuery = query.trim().toLocaleLowerCase(locale);
+    const normalizedQuery = normalizeSearchText(query.trim(), locale);
     return initialStudySessions.filter((session) => {
       const matchesPeriod = session.date >= periodRange.start && session.date <= periodRange.end;
       const matchesSubject = subjectFilter === "all" || session.subject?.id === subjectFilter;
-      const matchesQuery = !normalizedQuery || `${session.task?.title ?? ""} ${session.subject?.name ?? ""}`.toLocaleLowerCase(locale).includes(normalizedQuery);
+      const matchesQuery = !normalizedQuery || normalizeSearchText(`${session.task?.title ?? ""} ${session.subject?.name ?? ""}`, locale).includes(normalizedQuery);
       return matchesPeriod && matchesSubject && matchesQuery;
     });
   }, [initialStudySessions, locale, periodRange, query, subjectFilter]);
@@ -213,6 +254,28 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
 
   function startStudy(taskId: string) {
     window.dispatchEvent(new CustomEvent(START_STUDY_EVENT, { detail: { taskId } }));
+  }
+
+  // Manual toggles are dropped whenever the filters change, so a search never
+  // hides its matches inside a pile collapsed earlier.
+  function isGroupOpen(key: string, status: TaskStatus) {
+    return groupOverrides[key] ?? (isFiltering || status !== "DONE");
+  }
+
+  function toggleGroup(key: string, isOpen: boolean) {
+    setGroupOverrides((current) => ({ ...current, [key]: !isOpen }));
+  }
+
+  // Dates are formatted in the browser's time zone, so they're left out of the
+  // server render to avoid a hydration mismatch.
+  function groupedSubtitle(task: TaskSummary) {
+    if (!isBrowser) return null;
+    if (task.status === "DONE") {
+      return task.completedAt ? <small>{t("completedOn", { date: shortDateFormatter.format(new Date(task.completedAt)) })}</small> : null;
+    }
+    if (!task.dueDate) return null;
+    const isOverdue = new Date(task.dueDate).getTime() < new Date(referenceTime).getTime();
+    return <small className={isOverdue ? styles.overdue : ""}>{t("dueOn", { date: shortDateFormatter.format(new Date(task.dueDate)) })}</small>;
   }
 
   function toggleTaskDetails(taskId: string) {
@@ -319,6 +382,41 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
     setBusy(null);
   }
 
+  function renderTask(task: TaskSummary, subtitle: ReactNode) {
+    const totalMinutes = taskMinutes(task);
+    const isExpanded = expandedTaskIds.has(task.id);
+    return (
+      <article
+        className={`${styles.taskCard} ${isExpanded ? styles.expandedCard : ""} ${draggedTaskId === task.id ? styles.dragging : ""}`}
+        key={task.id}
+        style={{ "--subject-color": subjectColors.get(task.subject.id) } as CSSProperties}
+        draggable
+        onDragStart={(event) => handleCardDragStart(event, task)}
+        onDragEnd={handleCardDragEnd}
+      >
+        <div className={styles.compactRow}>
+          <button className={styles.compactMain} type="button" onClick={() => toggleTaskDetails(task.id)} aria-expanded={isExpanded} aria-controls={`task-details-${task.id}`}>
+            <span className={styles.compactIdentity}><strong className={task.status === "DONE" ? shared.completedTitle : ""}>{task.title}</strong>{subtitle}</span>
+            <span className={styles.compactHours}>{formatMinutes(totalMinutes)}</span>
+            <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ""}`} aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </button>
+          <button className={styles.quickStudy} type="button" onClick={() => startStudy(task.id)} disabled={busy !== null}><span aria-hidden="true">▶</span>{t("study")}</button>
+        </div>
+        {isExpanded && <div className={styles.cardDetails} id={`task-details-${task.id}`}>
+          <div className={styles.cardTop}><span className={`${shared.badge} ${task.priority === "HIGH" ? shared.badgeHigh : task.priority === "LOW" ? shared.badgeLow : shared.badgeMedium}`}>{priorityLabel(task.priority)}</span><strong className={styles.hoursBadge}>{formatMinutes(totalMinutes)}</strong></div>
+          {task.description && <p>{task.description}</p>}
+          <div className={styles.cardMeta}><strong>{task.subject.name}</strong><span>{task.dueDate ? dateFormatter.format(new Date(task.dueDate)) : t("noDate")}</span></div>
+          <label className={styles.statusControl}><span>{t("statusLabel")}</span><select value={task.status} onChange={(event) => handleStatus(task, event.target.value as TaskStatus)} disabled={busy !== null}>{STATUSES.map((value) => <option value={value} key={value}>{statusLabel(value)}</option>)}</select></label>
+          <div className={styles.cardActions}><button type="button" onClick={() => openTimeLog(task)} disabled={busy !== null}>{t("logTime")}</button><button type="button" onClick={() => openEdit(task)} disabled={busy !== null}>{common("edit")}</button><button className={styles.deleteLink} type="button" onClick={() => setDeletingTask(task)} disabled={busy !== null}>{common("delete")}</button></div>
+        </div>}
+      </article>
+    );
+  }
+
   function priorityLabel(priority: TaskPriority) {
     return t(`priority${priority[0]}${priority.slice(1).toLowerCase()}`);
   }
@@ -333,11 +431,11 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
       <div className={shared.toolbar}>
         <div className={styles.viewTitle}><strong>{t("boardTitle")}</strong><span>{t("taskCount", { count: visibleTasks.length })}</span></div>
         <div className={shared.filters}>
-          <select className={shared.filterSelect} value={subjectFilter} onChange={(event) => setSubjectFilter(event.target.value)} aria-label={common("filterSubject")}>
+          <select className={shared.filterSelect} value={subjectFilter} onChange={(event) => { setSubjectFilter(event.target.value); setGroupOverrides({}); }} aria-label={common("filterSubject")}>
             <option value="all">{common("allSubjects")}</option>
             {initialSubjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
           </select>
-          <input className={shared.search} type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t("search")} />
+          <input className={shared.search} type="search" value={query} onChange={(event) => { setQuery(event.target.value); setGroupOverrides({}); }} placeholder={t("search")} />
         </div>
       </div>
 
@@ -358,37 +456,33 @@ export default function TasksManager({ initialSubjects, initialTasks, initialStu
                 onDragOver={(event) => handleColumnDragOver(event, columnStatus)}
                 onDrop={(event) => handleColumnDrop(event, columnStatus)}
               >
-                {visibleTasks.filter((task) => task.status === columnStatus).map((task) => {
-                  const totalMinutes = task.timeEntries.reduce((sum, entry) => sum + entry.minutes, 0);
-                  const isExpanded = expandedTaskIds.has(task.id);
+                {columns[columnStatus].recent.length > 0 && <>
+                  <p className={styles.sectionLabel}>{t("recentDone")}</p>
+                  <div className={styles.groupCards}>{columns[columnStatus].recent.map((task) => renderTask(task, <small>({task.subject.name})</small>))}</div>
+                  {columns[columnStatus].groups.length > 0 && <p className={styles.sectionLabel}>{t("earlierDone")}</p>}
+                </>}
+                {columns[columnStatus].groups.map(({ subject, tasks: groupTasks, minutes }) => {
+                  const groupKey = `${columnStatus}-${subject.id}`;
+                  const isOpen = isGroupOpen(groupKey, columnStatus);
                   return (
-                    <article
-                      className={`${styles.taskCard} ${isExpanded ? styles.expandedCard : ""} ${draggedTaskId === task.id ? styles.dragging : ""}`}
-                      key={task.id}
-                      draggable
-                      onDragStart={(event) => handleCardDragStart(event, task)}
-                      onDragEnd={handleCardDragEnd}
+                    <section
+                      className={`${styles.subjectGroup} ${isOpen ? "" : styles.groupCollapsed} ${!isOpen && groupTasks.length > 1 ? styles.groupStacked : ""}`}
+                      key={groupKey}
+                      style={{ "--subject-color": subjectColors.get(subject.id) } as CSSProperties}
                     >
-                      <div className={styles.compactRow}>
-                        <button className={styles.compactMain} type="button" onClick={() => toggleTaskDetails(task.id)} aria-expanded={isExpanded} aria-controls={`task-details-${task.id}`}>
-                          <span className={styles.compactIdentity}><strong className={task.status === "DONE" ? shared.completedTitle : ""}>{task.title}</strong><small>({task.subject.name})</small></span>
-                          <span className={styles.compactHours}>{formatMinutes(totalMinutes)}</span>
-                          <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ""}`} aria-hidden="true">
-                            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                          </span>
-                        </button>
-                        <button className={styles.quickStudy} type="button" onClick={() => startStudy(task.id)} disabled={busy !== null}><span aria-hidden="true">▶</span>{t("study")}</button>
-                      </div>
-                      {isExpanded && <div className={styles.cardDetails} id={`task-details-${task.id}`}>
-                        <div className={styles.cardTop}><span className={`${shared.badge} ${task.priority === "HIGH" ? shared.badgeHigh : task.priority === "LOW" ? shared.badgeLow : shared.badgeMedium}`}>{priorityLabel(task.priority)}</span><strong className={styles.hoursBadge}>{formatMinutes(totalMinutes)}</strong></div>
-                        {task.description && <p>{task.description}</p>}
-                        <div className={styles.cardMeta}><strong>{task.subject.name}</strong><span>{task.dueDate ? dateFormatter.format(new Date(task.dueDate)) : t("noDate")}</span></div>
-                        <label className={styles.statusControl}><span>{t("statusLabel")}</span><select value={task.status} onChange={(event) => handleStatus(task, event.target.value as TaskStatus)} disabled={busy !== null}>{STATUSES.map((value) => <option value={value} key={value}>{statusLabel(value)}</option>)}</select></label>
-                        <div className={styles.cardActions}><button type="button" onClick={() => openTimeLog(task)} disabled={busy !== null}>{t("logTime")}</button><button type="button" onClick={() => openEdit(task)} disabled={busy !== null}>{common("edit")}</button><button className={styles.deleteLink} type="button" onClick={() => setDeletingTask(task)} disabled={busy !== null}>{common("delete")}</button></div>
-                      </div>}
-                    </article>
+                      <button className={styles.groupHeader} type="button" onClick={() => toggleGroup(groupKey, isOpen)} aria-expanded={isOpen} aria-controls={`task-group-${groupKey}`}>
+                        <span className={styles.groupDot} aria-hidden="true" />
+                        <span className={styles.groupName}>{subject.name}</span>
+                        {minutes > 0 && <span className={styles.groupMinutes}>{formatMinutes(minutes)}</span>}
+                        <span className={styles.groupCount}>{groupTasks.length}</span>
+                        <span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`} aria-hidden="true">
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </span>
+                      </button>
+                      {isOpen && <div className={styles.groupCards} id={`task-group-${groupKey}`}>{groupTasks.map((task) => renderTask(task, groupedSubtitle(task)))}</div>}
+                    </section>
                   );
                 })}
                 {counts[columnStatus] === 0 && <p className={styles.emptyColumn}>{t("emptyColumn")}</p>}

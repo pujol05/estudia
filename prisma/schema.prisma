@@ -108,6 +108,7 @@ model Task {
   description String?
   dueDate     DateTime?
   completed   Boolean   @default(false)
+  completedAt DateTime?
   status      String    @default("TODO")
   priority    String    @default("MEDIUM")
 
