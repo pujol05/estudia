@@ -21,11 +21,18 @@ import styles from "@/components/tasks/TasksManager.module.css";
 
 type Props = { referenceTime: string; initialSubjects: SubjectOption[]; initialTasks: TaskSummary[]; initialStudySessions: StudySessionSummary[] };
 type Feedback = { type: "error" | "success"; text: string } | null;
-type PeriodMode = "day" | "week";
+type PeriodMode = "day" | "week" | "month" | "custom";
 type TaskGroup = { subject: SubjectOption; tasks: TaskSummary[]; minutes: number };
 type ColumnView = { recent: TaskSummary[]; groups: TaskGroup[] };
+type PeriodEntry = { minutes: number; subject: SubjectOption | null; task: { id: string; title: string } | null };
 
 const STATUSES: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
+const PERIODS: { mode: PeriodMode; label: string; empty: string }[] = [
+  { mode: "day", label: "periodDay", empty: "noHoursDay" },
+  { mode: "week", label: "periodWeek", empty: "noHoursWeek" },
+  { mode: "month", label: "periodMonth", empty: "noHoursMonth" },
+  { mode: "custom", label: "periodCustom", empty: "noHoursPeriod" },
+];
 const RECENT_DONE_MS = 24 * 60 * 60 * 1000;
 // Picked by position in the alphabetical subject list, so each subject keeps
 // the same colour in every column.
@@ -60,6 +67,27 @@ function taskMinutes(task: TaskSummary) {
   return task.timeEntries.reduce((sum, entry) => sum + entry.minutes, 0);
 }
 
+function toggled(current: Set<string>, id: string) {
+  const next = new Set(current);
+  if (next.has(id)) next.delete(id);
+  else next.add(id);
+  return next;
+}
+
+function shiftDays(value: string, days: number) {
+  if (!value) return "";
+  const date = new Date(`${value}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function getMonthRange(value: string) {
+  if (!value) return { start: "", end: "" };
+  const [year, month] = value.split("-").map(Number);
+  const lastDay = new Date(Date.UTC(year, month, 0));
+  return { start: `${value.slice(0, 7)}-01`, end: lastDay.toISOString().slice(0, 10) };
+}
+
 function getWeekRange(value: string) {
   if (!value) return { start: "", end: "" };
   const date = new Date(`${value}T00:00:00.000Z`);
@@ -69,6 +97,16 @@ function getWeekRange(value: string) {
   const end = new Date(start);
   end.setUTCDate(start.getUTCDate() + 6);
   return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10) };
+}
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <span className={`${styles.chevron} ${open ? styles.chevronOpen : ""}`} aria-hidden="true">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
 }
 
 export default function TasksManager({ referenceTime, initialSubjects, initialTasks, initialStudySessions }: Props) {
@@ -83,6 +121,9 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
   const [query, setQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [periodMode, setPeriodMode] = useState<PeriodMode>("day");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
+  const [openHourSubjects, setOpenHourSubjects] = useState<Set<string>>(() => new Set());
   const [expandedTaskIds, setExpandedTaskIds] = useState<Set<string>>(() => new Set());
   const [groupOverrides, setGroupOverrides] = useState<Record<string, boolean>>({});
   const [form, setForm] = useState<TaskInput>(EMPTY_FORM);
@@ -108,8 +149,12 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
     () => new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }),
     [locale],
   );
-  const weekFormatter = useMemo(
+  const rangeFormatter = useMemo(
     () => new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }),
+    [locale],
+  );
+  const monthFormatter = useMemo(
+    () => new Intl.DateTimeFormat(locale, { month: "long", year: "numeric", timeZone: "UTC" }),
     [locale],
   );
   const shortDateFormatter = useMemo(
@@ -149,56 +194,67 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
     })) as Record<TaskStatus, ColumnView>;
   }, [initialSubjects, referenceTime, visibleTasks]);
 
-  const periodRange = useMemo(
-    () => periodMode === "week" ? getWeekRange(activeDate) : { start: activeDate, end: activeDate },
-    [activeDate, periodMode],
-  );
+  const periodRange = useMemo(() => {
+    if (periodMode === "week") return getWeekRange(activeDate);
+    if (periodMode === "month") return getMonthRange(activeDate);
+    if (periodMode === "custom") {
+      const end = customEnd || activeDate;
+      const start = customStart || shiftDays(end, -29);
+      return start <= end ? { start, end } : { start: end, end: start };
+    }
+    return { start: activeDate, end: activeDate };
+  }, [activeDate, customEnd, customStart, periodMode]);
 
   const periodLabel = useMemo(() => {
     if (!periodRange.start) return "—";
     const start = new Date(`${periodRange.start}T00:00:00.000Z`);
     if (periodMode === "day") return dayFormatter.format(start);
+    if (periodMode === "month") return monthFormatter.format(start);
     const end = new Date(`${periodRange.end}T00:00:00.000Z`);
-    return weekFormatter.formatRange(start, end);
-  }, [dayFormatter, periodMode, periodRange, weekFormatter]);
+    return rangeFormatter.formatRange(start, end);
+  }, [dayFormatter, monthFormatter, periodMode, periodRange, rangeFormatter]);
 
-  const taskRows = useMemo(() => visibleTasks
-    .map((task) => ({
-      task,
-      minutes: task.timeEntries
-        .filter((entry) => entry.date >= periodRange.start && entry.date <= periodRange.end)
-        .reduce((sum, entry) => sum + entry.minutes, 0),
-    }))
-    .filter((row) => row.minutes > 0)
-    .sort((a, b) => b.minutes - a.minutes), [periodRange, visibleTasks]);
-
-  const periodSessions = useMemo(() => {
+  // Task time comes from the live task list, so a freshly logged entry shows
+  // up at once; sessions without a task only exist in the server data.
+  const periodEntries = useMemo((): PeriodEntry[] => {
+    const inPeriod = (date: string) => date >= periodRange.start && date <= periodRange.end;
     const normalizedQuery = normalizeSearchText(query.trim(), locale);
-    return initialStudySessions.filter((session) => {
-      const matchesPeriod = session.date >= periodRange.start && session.date <= periodRange.end;
-      const matchesSubject = subjectFilter === "all" || session.subject?.id === subjectFilter;
-      const matchesQuery = !normalizedQuery || normalizeSearchText(`${session.task?.title ?? ""} ${session.subject?.name ?? ""}`, locale).includes(normalizedQuery);
-      return matchesPeriod && matchesSubject && matchesQuery;
-    });
-  }, [initialStudySessions, locale, periodRange, query, subjectFilter]);
+    const taskEntries = visibleTasks.flatMap((task) => task.timeEntries
+      .filter((entry) => inPeriod(entry.date))
+      .map((entry) => ({ minutes: entry.minutes, subject: task.subject, task: { id: task.id, title: task.title } })));
+    const generalEntries = initialStudySessions
+      .filter((session) => !session.task
+        && inPeriod(session.date)
+        && (subjectFilter === "all" || session.subject?.id === subjectFilter)
+        && (!normalizedQuery || normalizeSearchText(session.subject?.name ?? "", locale).includes(normalizedQuery)))
+      .map((session) => ({ minutes: session.minutes, subject: session.subject, task: null }));
+    return [...taskEntries, ...generalEntries];
+  }, [initialStudySessions, locale, periodRange, query, subjectFilter, visibleTasks]);
 
   const subjectRows = useMemo(() => {
-    const totals = new Map<string, { id: string; name: string; minutes: number; sessions: number }>();
-    periodSessions.forEach((session) => {
-      const key = session.subject?.id ?? "general";
-      const current = totals.get(key) ?? { id: key, name: session.subject?.name ?? t("generalStudy"), minutes: 0, sessions: 0 };
-      current.minutes += session.minutes;
+    const totals = new Map<string, { id: string; name: string; minutes: number; sessions: number; tasks: Map<string, { id: string; title: string; minutes: number }> }>();
+    periodEntries.forEach((entry) => {
+      const key = entry.subject?.id ?? "general";
+      const current = totals.get(key) ?? { id: key, name: entry.subject?.name ?? t("generalStudy"), minutes: 0, sessions: 0, tasks: new Map() };
+      const taskKey = entry.task?.id ?? "none";
+      const taskRow = current.tasks.get(taskKey) ?? { id: taskKey, title: entry.task?.title ?? t("noTaskStudy"), minutes: 0 };
+      current.minutes += entry.minutes;
       current.sessions += 1;
+      taskRow.minutes += entry.minutes;
+      current.tasks.set(taskKey, taskRow);
       totals.set(key, current);
     });
-    return [...totals.values()].sort((a, b) => b.minutes - a.minutes);
-  }, [periodSessions, t]);
+    return [...totals.values()]
+      .map((row) => ({ ...row, tasks: [...row.tasks.values()].sort((a, b) => b.minutes - a.minutes) }))
+      .sort((a, b) => b.minutes - a.minutes);
+  }, [periodEntries, t]);
 
   const counts = useMemo(() => Object.fromEntries(STATUSES.map((status) => [status, visibleTasks.filter((task) => task.status === status).length])) as Record<TaskStatus, number>, [visibleTasks]);
   const totalTasks = visibleTasks.length;
   const doneDegrees = totalTasks ? (counts.DONE / totalTasks) * 360 : 0;
   const progressDegrees = totalTasks ? (counts.IN_PROGRESS / totalTasks) * 360 : 0;
-  const periodMinutes = taskRows.reduce((sum, row) => sum + row.minutes, 0);
+  const periodMinutes = subjectRows.reduce((sum, row) => sum + row.minutes, 0);
+  const activePeriod = PERIODS.find((period) => period.mode === periodMode) ?? PERIODS[0];
 
   function formatMinutes(minutes: number) {
     const hours = Math.floor(minutes / 60);
@@ -279,12 +335,7 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
   }
 
   function toggleTaskDetails(taskId: string) {
-    setExpandedTaskIds((current) => {
-      const next = new Set(current);
-      if (next.has(taskId)) next.delete(taskId);
-      else next.add(taskId);
-      return next;
-    });
+    setExpandedTaskIds((current) => toggled(current, taskId));
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -398,11 +449,7 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
           <button className={styles.compactMain} type="button" onClick={() => toggleTaskDetails(task.id)} aria-expanded={isExpanded} aria-controls={`task-details-${task.id}`}>
             <span className={styles.compactIdentity}><strong className={task.status === "DONE" ? shared.completedTitle : ""}>{task.title}</strong>{subtitle}</span>
             <span className={styles.compactHours}>{formatMinutes(totalMinutes)}</span>
-            <span className={`${styles.chevron} ${isExpanded ? styles.chevronOpen : ""}`} aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
+            <Chevron open={isExpanded} />
           </button>
           <button className={styles.quickStudy} type="button" onClick={() => startStudy(task.id)} disabled={busy !== null}><span aria-hidden="true">▶</span>{t("study")}</button>
         </div>
@@ -475,11 +522,7 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
                         <span className={styles.groupName}>{subject.name}</span>
                         {minutes > 0 && <span className={styles.groupMinutes}>{formatMinutes(minutes)}</span>}
                         <span className={styles.groupCount}>{groupTasks.length}</span>
-                        <span className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`} aria-hidden="true">
-                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </span>
+                        <Chevron open={isOpen} />
                       </button>
                       {isOpen && <div className={styles.groupCards} id={`task-group-${groupKey}`}>{groupTasks.map((task) => renderTask(task, groupedSubtitle(task)))}</div>}
                     </section>
@@ -494,7 +537,22 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
 
       {initialSubjects.length > 0 && (
         <section className={styles.analytics}>
-          <div className={styles.analyticsHeading}><div><h2>{t("activityTitle")}</h2><p>{t("activitySubtitle")}</p></div><div className={styles.analyticsControls}><div className={styles.periodToggle} role="group" aria-label={t("periodLabel")}><button className={periodMode === "day" ? styles.activePeriod : ""} type="button" onClick={() => setPeriodMode("day")}>{t("periodDay")}</button><button className={periodMode === "week" ? styles.activePeriod : ""} type="button" onClick={() => setPeriodMode("week")}>{t("periodWeek")}</button></div><label><span>{t("activityDate")}</span><input type="date" value={activeDate} onChange={(event) => setSelectedDate(event.target.value || browserToday())} /></label></div></div>
+          <div className={styles.analyticsHeading}>
+            <div><h2>{t("activityTitle")}</h2><p>{t("activitySubtitle")}</p></div>
+            <div className={styles.analyticsControls}>
+              <div className={styles.periodToggle} role="group" aria-label={t("periodLabel")}>
+                {PERIODS.map(({ mode, label }) => <button className={periodMode === mode ? styles.activePeriod : ""} type="button" key={mode} onClick={() => setPeriodMode(mode)}>{t(label)}</button>)}
+              </div>
+              {periodMode === "custom" ? (
+                <div className={styles.customRange}>
+                  <label><span>{t("rangeFrom")}</span><input type="date" value={periodRange.start} max={periodRange.end} onChange={(event) => setCustomStart(event.target.value)} /></label>
+                  <label><span>{t("rangeTo")}</span><input type="date" value={periodRange.end} min={periodRange.start} onChange={(event) => setCustomEnd(event.target.value)} /></label>
+                </div>
+              ) : (
+                <label><span>{t("activityDate")}</span><input type="date" value={activeDate} onChange={(event) => setSelectedDate(event.target.value || browserToday())} /></label>
+              )}
+            </div>
+          </div>
           <div className={styles.analyticsGrid}>
             <article className={styles.progressPanel}>
               <h3>{t("progressTitle")}</h3>
@@ -504,12 +562,36 @@ export default function TasksManager({ referenceTime, initialSubjects, initialTa
               </div>
             </article>
             <article className={styles.hoursPanel}>
-              <div className={styles.panelTitle}><div><h3>{t("hoursByTask")}</h3><span>{periodLabel}</span></div><strong>{formatMinutes(periodMinutes)}</strong></div>
-              {taskRows.length === 0 ? <p className={styles.noHours}>{t(periodMode === "day" ? "noHoursDay" : "noHoursWeek")}</p> : <div className={styles.tableWrap}><table><thead><tr><th>{t("taskColumn")}</th><th>{common("subject")}</th><th>{t("hoursColumn")}</th></tr></thead><tbody>{taskRows.map(({ task, minutes }) => <tr key={task.id}><td>{task.title}</td><td>{task.subject.name}</td><td>{formatMinutes(minutes)}</td></tr>)}</tbody></table></div>}
-            </article>
-            <article className={`${styles.hoursPanel} ${styles.subjectHours}`}>
-              <div className={styles.panelTitle}><div><h3>{t("hoursBySubject")}</h3><span>{t(periodMode === "day" ? "groupedHintDay" : "groupedHintWeek")}</span></div></div>
-              {subjectRows.length === 0 ? <p className={styles.noHours}>{t(periodMode === "day" ? "noHoursDay" : "noHoursWeek")}</p> : <div className={styles.tableWrap}><table><thead><tr><th>{common("subject")}</th><th>{t("sessionsColumn")}</th><th>{t("hoursColumn")}</th></tr></thead><tbody>{subjectRows.map((subject) => <tr key={subject.id}><td>{subject.name}</td><td>{subject.sessions}</td><td>{formatMinutes(subject.minutes)}</td></tr>)}</tbody></table></div>}
+              <div className={styles.panelTitle}><div><h3>{t("hoursBySubject")}</h3><span>{periodLabel}</span></div><strong>{formatMinutes(periodMinutes)}</strong></div>
+              {subjectRows.length === 0 ? <p className={styles.noHours}>{t(activePeriod.empty)}</p> : (
+                <ul className={styles.subjectHoursList}>
+                  {subjectRows.map((row) => {
+                    const hasTasks = row.tasks.some((task) => task.id !== "none");
+                    const isOpen = hasTasks && openHourSubjects.has(row.id);
+                    return (
+                      <li key={row.id} style={{ "--subject-color": subjectColors.get(row.id) ?? "#9aa7ad" } as CSSProperties}>
+                        <button
+                          className={styles.subjectHoursRow}
+                          type="button"
+                          onClick={() => setOpenHourSubjects((current) => toggled(current, row.id))}
+                          disabled={!hasTasks}
+                          aria-expanded={hasTasks ? isOpen : undefined}
+                          aria-controls={hasTasks ? `hours-${row.id}` : undefined}
+                        >
+                          <span className={styles.groupDot} aria-hidden="true" />
+                          <span className={styles.subjectHoursMain}>
+                            <span className={styles.subjectHoursName}><strong>{row.name}</strong><small>{t("sessionsCount", { count: row.sessions })}</small></span>
+                            <span className={styles.subjectHoursBar} aria-hidden="true"><span style={{ width: `${(row.minutes / periodMinutes) * 100}%` }} /></span>
+                          </span>
+                          <strong className={styles.subjectHoursValue}>{formatMinutes(row.minutes)}</strong>
+                          {hasTasks ? <Chevron open={isOpen} /> : <span className={styles.chevron} aria-hidden="true" />}
+                        </button>
+                        {isOpen && <ul className={styles.subjectTaskHours} id={`hours-${row.id}`}>{row.tasks.map((task) => <li key={task.id}><span>{task.title}</span><strong>{formatMinutes(task.minutes)}</strong></li>)}</ul>}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </article>
           </div>
         </section>
